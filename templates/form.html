@@ -166,7 +166,7 @@
             resetAssetFields();
             const workerSelect = document.getElementById('worker_name');
             workerSelect.innerHTML = '<option value="">Cargando...</option>';
-            workerSelect.disabled = true;
+            workerSelect.disabled = false;
 
             if (companySelect.value) {
                 // Cargar trabajadores de la empresa seleccionada
@@ -188,7 +188,7 @@
                         workerSelect.disabled = false;
                     } else {
                         workerSelect.innerHTML = '<option value="">No hay trabajadores</option>';
-                        workerSelect.disabled = true;
+                        workerSelect.disabled = false;
                     }
                 });
 

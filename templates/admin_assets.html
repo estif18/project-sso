@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Administrar Equipos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Equipos</h1>
+    <form method="POST" style="max-width:400px;margin:auto;">
+        <label for="type">Tipo de equipo:</label>
+        <select id="type" name="type" required>
+            <option value="">Seleccione tipo</option>
+            <option value="CAMIONETA">CAMIONETA</option>
+            <option value="CARGADOR FRONTAL">CARGADOR FRONTAL</option>
+            <option value="RETROEXCAVADORA">RETROEXCAVADORA</option>
+            <option value="EXCAVADORA">EXCAVADORA</option>
+            <option value="MONTACARGA">MONTACARGA</option>
+            <option value="MINICARGADOR">MINICARGADOR</option>
+            <option value="TRACTOR">TRACTOR</option>
+            <option value="GRÚA">GRÚA</option>
+            <option value="CISTERNA">CISTERNA</option>
+            <option value="UTILITARIO">UTILITARIO</option>
+            <option value="VOLQUETE">VOLQUETE</option>
+            <option value="AMBULANCIA">AMBULANCIA</option>
+            <option value="MOTONIVELADORA">MOTONIVELADORA</option>
+            <option value="CAMION">CAMION</option>
+        </select>
+        <label for="code">Placa/Código:</label>
+        <input type="text" id="code" name="code" required>
+        <label for="company_id">Empresa:</label>
+        <select id="company_id" name="company_id" required>
+            <option value="">Seleccione una empresa</option>
+            {% for company in companies %}
+            <option value="{{ company.id }}">{{ company.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Agregar Equipo</button>
+    </form>
+    <h2 style="text-align:center;">Lista de Equipos</h2>
+    <form method="get" style="max-width:900px;margin:20px auto;display:flex;gap:16px;align-items:center;justify-content:center;flex-wrap:wrap;">
+        <label for="company_id">Empresa:</label>
+        <select name="company_id" id="company_id" onchange="this.form.submit()">
+            <option value="">Todas</option>
+            {% for company in companies %}
+            <option value="{{ company.id }}" {% if selected_company and company.id == selected_company %}selected{% endif %}>{{ company.name }}</option>
+            {% endfor %}
+        </select>
+        <label for="type">Tipo:</label>
+        <select name="type" id="type" onchange="this.form.submit()">
+            <option value="">Todos</option>
+            {% for t in all_types|sort %}
+            <option value="{{ t }}" {% if selected_type == t %}selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+        </select>
+        <noscript><button type="submit">Filtrar</button></noscript>
+    </form>
+    <table class="admin-table" style="margin:auto;max-width:900px;width:100%;border-collapse:collapse;">
+        <thead>
+            <tr>
+                <th>Tipo</th>
+                <th>Código</th>
+                <th>Empresa</th>
+                <th>Editar</th>
+                <th>Eliminar</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for asset in assets %}
+            <tr>
+                <td>{{ asset.type }}</td>
+                <td>{{ asset.code }}</td>
+                <td>{{ asset.company.name }}</td>
+                <td><a href="{{ url_for('edit_asset', asset_id=asset.id) }}">Editar</a></td>
+                <td>
+                    <form action="{{ url_for('delete_asset', asset_id=asset.id) }}" method="post" style="display:inline;">
+                        <button type="submit" onclick="return confirm('¿Seguro que deseas eliminar este equipo?');" style="color:#e53e3e; background:none; border:none; text-decoration:underline; cursor:pointer;">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% if edit_asset %}
+    <hr>
+    <h3>Editar Equipo</h3>
+    <form method="POST" style="max-width:400px;margin:auto;">
+        <label for="type">Tipo de equipo:</label>
+        <select id="type" name="type" required>
+            <option value="">Seleccione tipo</option>
+            <option value="CAMIONETA" {% if edit_asset.type == 'CAMIONETA' %}selected{% endif %}>CAMIONETA</option>
+            <option value="CARGADOR FRONTAL" {% if edit_asset.type == 'CARGADOR FRONTAL' %}selected{% endif %}>CARGADOR FRONTAL</option>
+            <option value="RETROEXCAVADORA" {% if edit_asset.type == 'RETROEXCAVADORA' %}selected{% endif %}>RETROEXCAVADORA</option>
+            <option value="EXCAVADORA" {% if edit_asset.type == 'EXCAVADORA' %}selected{% endif %}>EXCAVADORA</option>
+            <option value="MONTACARGA" {% if edit_asset.type == 'MONTACARGA' %}selected{% endif %}>MONTACARGA</option>
+            <option value="MINICARGA" {% if edit_asset.type == 'MINICARGA' %}selected{% endif %}>MINICARGA</option>
+            <option value="TRACTOR" {% if edit_asset.type == 'TRACTOR' %}selected{% endif %}>TRACTOR</option>
+            <option value="GRÚA" {% if edit_asset.type == 'GRÚA' %}selected{% endif %}>GRÚA</option>
+            <option value="CISTERNA" {% if edit_asset.type == 'CISTERNA' %}selected{% endif %}>CISTERNA</option>
+            <option value="UTILITARIO" {% if edit_asset.type == 'UTILITARIO' %}selected{% endif %}>UTILITARIO</option>
+            <option value="VOLQUETE" {% if edit_asset.type == 'VOLQUETE' %}selected{% endif %}>VOLQUETE</option>
+            <option value="AMBULANCIA" {% if edit_asset.type == 'AMBULANCIA' %}selected{% endif %}>AMBULANCIA</option>
+            <option value="MOTONIVELADORA" {% if edit_asset.type == 'MOTONIVELADORA' %}selected{% endif %}>MOTONIVELADORA</option>
+            <option value="CAMION" {% if edit_asset.type == 'CAMION' %}selected{% endif %}>CAMION</option>
+        </select>
+        <label for="code">Placa/Código:</label>
+        <input type="text" id="code" name="code" value="{{ edit_asset.code }}" required>
+        <label for="company_id">Empresa:</label>
+        <select id="company_id" name="company_id" required>
+            <option value="">Seleccione una empresa</option>
+            {% for company in companies %}
+            <option value="{{ company.id }}" {% if company.id == edit_asset.company_id %}selected{% endif %}>{{ company.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Guardar Cambios</button>
+    </form>
+    {% endif %}
+    <div style="text-align:center;margin-top:20px;">
+        <a href="/admin/companies">Administrar Empresas</a>
+        <a href="/admin/workers">Administrar Trabajadores</a>
+        <a href="/">Volver al Formulario</a>
+    </div>
+</body>
+</html>

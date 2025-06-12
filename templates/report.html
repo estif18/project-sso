@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Checklist</title>
+    <style>
+    body {
+        font-family: 'Segoe UI', 'Arial', 'Helvetica Neue', Helvetica, sans-serif;
+        font-size: 14px;
+        color: #222;
+        background: #f8f9fa;
+        margin: 0;
+        padding: 0;
+    }
+    .pdf-container {
+        max-width: 900px;
+        margin: 30px auto;
+        padding: 36px 48px 32px 48px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+        border: 1px solid #e2e8f0;
+    }
+    h1, h2, h3, h4 {
+        color: #1a202c;
+        margin-bottom: 10px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    h1 { font-size: 2.2em; margin-bottom: 22px; border-bottom: 2px solid #3182ce; padding-bottom: 8px; }
+    h2 { font-size: 1.25em; margin-bottom: 14px; }
+    h3 { font-size: 1.08em; margin-bottom: 8px; }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 22px;
+        background: #f9fafb;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    }
+    th, td {
+        border: 1px solid #cbd5e1;
+        padding: 9px 14px;
+        text-align: left;
+    }
+    th {
+        background: #e2e8f0;
+        font-weight: 700;
+        color: #2d3748;
+    }
+    .section-title {
+        background: #3182ce;
+        color: #fff;
+        font-weight: 700;
+        font-size: 1.08em;
+        padding: 8px 14px;
+        border-radius: 6px 6px 0 0;
+        margin-bottom: 0;
+        letter-spacing: 0.5px;
+    }
+    .cumple { color: #2e7d32; font-weight: 700; }
+    .nocumple { color: #b91c1c; font-weight: 700; }
+    .noaplica { color: #888; font-weight: 700; }
+    .observaciones, .foto-adjunta {
+        margin-bottom: 22px;
+        background: #f1f5f9;
+        border-left: 4px solid #3182ce;
+        padding: 12px 18px;
+        border-radius: 6px;
+    }
+    img.foto-adjunta {
+        max-width: 340px;
+        max-height: 340px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px #b6c2d1;
+        display: block;
+        margin-top: 8px;
+        border: 1.5px solid #3182ce;
+    }
+    ul {
+        margin: 0 0 12px 22px;
+        padding: 0;
+    }
+    .footer {
+        text-align: right;
+        color: #888;
+        font-size: 12px;
+        margin-top: 40px;
+        border-top: 1px solid #e2e8f0;
+        padding-top: 10px;
+    }
+    .header-flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 18px;
+    }
+    .header-flex .logo-header img {
+        height: 64px;
+        margin-left: 24px;
+    }
+    @media (max-width: 700px) {
+        .header-flex .logo-header img { height: 44px; margin-left: 8px; }
+    }
+    @media print {
+        .logo-header { position: fixed; right: 40px; top: 24px; }
+    }
+    @page {
+        margin: 32px 32px 32px 32px;
+    }
+    </style>
+</head>
+<body>
+    <div class="pdf-container">
+        <div class="header-flex">
+            <div>
+                <h1 style="margin-bottom:0; border-bottom:none; padding-bottom:0;">Reporte de Checklist</h1>
+            </div>
+            <div class="logo-header">
+                <img src="{{ url_for('static', filename='logo-minera.png') }}" alt="Minera Santa Luisa">
+            </div>
+        </div>
+        <h2>Datos del Registro</h2>
+        <table>
+            <tr><th>ID</th><td>{{ submission.id }}</td></tr>
+            <tr><th>Empresa</th><td>{{ company.name }}</td></tr>
+            <tr><th>Trabajador</th><td>{{ worker.name }}</td></tr>
+            <tr><th>Equipo</th><td>{{ asset.type }}</td></tr>
+            <tr><th>Placa/Código</th><td>{{ asset.code }}</td></tr>
+            <tr><th>Fecha y hora de registro</th><td>{{ created_at.strftime('%d/%m/%Y %H:%M:%S') }} (GMT-5 Perú)</td></tr>
+        </table>
+        {% set checklist = daily_checklist.to_dict() if daily_checklist else {} %}
+        {% set tools_check = tools_check.to_dict() if tools_check else {} %}
+        {% if checklist %}
+        <h3 class="section-title">Checklist Diario</h3>
+        <table>
+            <thead>
+                <tr><th>Descripción</th><th style="text-align:center;">Respuesta</th></tr>
+            </thead>
+            <tbody>
+            {% set checklist_desc = {
+                'item0': 'CHEQUEO EL STICKER SI LLEGA AL KILOMETRAJE DE MANTTO LLEVE AL TALLER',
+                'prox_mantto': 'PROX MANTTO',
+                'item1': 'CHEQUEE SI LA UNIDAD TIENE ALGÚN ROCE, ABOLLADURA, ETC.',
+                'item2': 'VERIFIQUE QUE NO EXISTAN FUGAS DE ACEITE, AGUA, COMBUSTIBLE*',
+                'item3': 'PURGAR EL AGUA DEL FILTRO DE PETRÓLEO*',
+                'item4': 'REVISE EL NIVEL DE ACEITE DE MOTOR*',
+                'item5': 'REVISE EL NIVEL DE ACEITE HIDRÁULICO',
+                'item6': 'REVISE EL NIVEL DE LÍQUIDO DE FRENO*',
+                'item7': 'REVISE EL NIVEL DE LÍQUIDO DE EMBRAGUE*',
+                'item8': 'REVISE EL NIVEL DE AGUA DEL LIMPIAPARABRISAS',
+                'item9': 'REVISE CONEXIONES DE BATERÍA Y NIVEL DE ELECTROLITO*',
+                'item10': 'REVISE TENSIÓN DE LAS FAJAS DE ALTERNADOR*',
+                'item11': 'VERIFIQUE EL AJUSTE DE TUERCAS DE LAS RUEDAS*',
+                'item12': 'REVISE ESPEJOS RETROVISORES *',
+                'item13': 'CINTURÓN DE SEGURIDAD *',
+                'item14': 'COMPROBAR ALARMA DE RETROCESO *',
+                'item15': 'COMPROBAR NIVEL DEL REFRIGERANTE',
+                'item16': 'TAPA DE TANQUE DE COMBUSTIBLE',
+                'item17': 'VERIFIQUE PROFUNDIDAD DE NEUMÁTICOS',
+                'item18': 'COMPUERTAS TRASERAS EN CASO DE FURGÓN *',
+                'item19': 'CABLE PARA PASAR CORRIENTE DE BATERÍA',
+                'item100': 'VERIFIQUE QUE NO EXISTAN FUGAS DE ACEITE, AGUA, COMBUSTIBLE O LIQUIDO DE FRENO QUE MOJE LOS NEUMÁTICOS*',
+                'item101': 'REVISE LUCES ( BAJA Y ALTA - RUTA ) *',
+                'item102': 'VERIFIQUE FUNCIONAMIENTO NORMAL DEL TABLERO DE INSTRUMENTOS',
+                'item103': 'NIVEL DE COMBUSTIBLE MAYOR DE 1/4 DE TANQUE',
+                'item104': 'COMPROBAR FUNCIONAMIENTO DE CLAXON *',
+                'item105': 'FRENO DE MANO Y PARQUEO *',
+                'item106': 'PRESIÓN DE ACEITE DE MOTOR',
+                'item107': 'CARGA DE ALTERNADOR',
+                'item108': 'TABLERO DE CONTROL',
+                'item200': 'NIVEL DE ACEITE DE TRANSMISIÓN Y HIDRÁULICO',
+                'item201': 'UÑAS Y CADENA DE LEVANTE',
+                'item202': 'BRAZO DE SOPORTE',
+                'item203': 'AJUSTE DE CADENAS Y ESTADO DEL TEMPLADOR',
+                       <img src="file:///{{ app_root }}/static/uploads/{{ checklist['foto'] }}" alt="Foto adjunta Checklist Diario" class="foto-adjunta">
+                ...
+                <img src="file:///{{ app_root }}/static/uploads/{{ tools_check['foto'] }}" alt="Foto adjunta Herramientas y Equipos de Seguridad" class="foto-adjunta">         'item204': 'ESTADO DE RUEDA GUÍA Y SPROCKET',
+                'item205': 'ESTADO DE CONTROL DE MANDOS ',
+                'item300': 'ESTADO DE ROLA',
+                'item301': 'LAS GOMAS DE LA ROLA',
+                'item400': 'TOLDERA ',
+                'item401': 'CINTA REFLECTIVA VISIBLE',
+                'item402': 'GANCHOS DE COMPUERTA TRASERA',
+                'item403': 'TEMPLADORES DE LA COMPUERTA',
+                'item404': 'REVISIÓN DE LA TOLVA (BASE, PINES DE COMPUERTA)',
+                'item405': 'FUGAS DE ACEITE DE PISTÓN DE LEVANTE Y TANQUE HIDRÁULICO',
+                'item500': 'ACCESORIOS DE LA PLUMA Y PLATAFORMA',
+                'item501': 'ACCESORIOS DE IZAJE',
+                'item600': 'TANQUE - CONTOMETRO Y PISTOLA SURTIDORA AUTOMÁTICA',
+                'item601': 'BOMBA DE AGUA '
+            } %}
+            {% for key, value in checklist.items() %}
+                {% if key in checklist_desc and value in ['C','NC'] %}
+                <tr>
+                    <td>{{ checklist_desc[key] }}</td>
+                    <td style="text-align:center;">{{ value }}</td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+        {% if tools_check %}
+        <h3 class="section-title">Herramientas y Equipos de Seguridad</h3>
+        <table>
+            <thead>
+                <tr><th>Ítem</th><th style="text-align:center;">Respuesta</th></tr>
+            </thead>
+            <tbody>
+            {% set tools_desc = {
+                'herr_item1': 'GATA Y LLAVE DE RUEDAS*',
+                'herr_item2': 'CINTA REFLECTIVA',
+                'herr_item3': 'LLANTA DE REPUESTO*',
+                'herr_extintor_fecha': 'EXTINTOR - FECHA VENCIMIENTO',
+                'herr_item4': 'EXTINTOR',
+                'herr_item5': 'TRIANGULO DE SEGURIDAD / CONOS DE SEGURIDAD',
+                'herr_item6': 'BOTIQUIN',
+                'herr_item7': 'PAÑO ABSORVENTE',
+                'herr_item8': 'TACO VIAL DE SEGURIDAD PARA VEHÍCULOS (2 UND)*',
+                'kit_panos': 'PAÑOS ABSORBENTES DE HIDROCARBUROS',
+                'kit_pico': 'PICO',
+                'kit_lampa': 'LAMPA',
+                'kit_costales': 'COSTALES (PARA RECOGER LA TIERRA CONTAMINADA)',
+                'kit_salchicha': 'SALCHICHA ABSORBENTE GRANDE',
+                'kit_bandeja': 'BANDEJA ANTIDERRAME',
+                'kit_tacos': 'TACOS O TARUGOS DE MADERA',
+                'kit_trajes': 'TRAJES TYBEK',
+                'kit_guantes': 'PAR DE GUANTES',
+                'otros_soat': 'SOAT',
+                'otros_soat_fecha': 'SOAT - FECHA VENCIMIENTO',
+                'otros_propiedad': 'Tarjeta de propiedad',
+                'otros_circulacion': 'Tarjeta de circulación',
+                'otros_licencia': 'Licencia de conducir'
+            } %}
+            {% for key, value in tools_check.items() %}
+                {% if key in tools_desc and value in ['C','NC'] and key not in ['herr_llanta_fecha','herr_botiquin_fecha'] %}
+                <tr>
+                    <td>{{ tools_desc[key] }}</td>
+                    <td style="text-align:center;">{{ value }}</td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+        {% if checklist and checklist.get('observaciones') %}
+        <div class="observaciones">
+            <h3>Observaciones adicionales</h3>
+            <p>{{ checklist['observaciones'] }}</p>
+        </div>
+        {% endif %}
+        {% if tools_check and tools_check.get('observaciones') %}
+        <div class="observaciones">
+            <h3>Observaciones adicionales - Herramientas y Equipos de Seguridad</h3>
+            <p>{{ tools_check['observaciones'] }}</p>
+        </div>
+        {% endif %}
+        {% if checklist and checklist.get('foto') %}
+        <div class="foto-adjunta">
+            <h3>Foto adjunta - Checklist Diario</h3>
+            {% if pdf_mode %}
+                <img src="file:///{{ (app_root ~ '/static/uploads/' ~ checklist['foto'])|replace('\\', '/') }}" alt="Foto adjunta Checklist Diario" class="foto-adjunta">
+            {% else %}
+                <img src="{{ url_for('uploaded_file', filename=checklist['foto']) }}" alt="Foto adjunta Checklist Diario" class="foto-adjunta">
+            {% endif %}
+        </div>
+        {% endif %}
+        {% if tools_check and tools_check.get('foto') %}
+        <div class="foto-adjunta">
+            <h3>Foto adjunta - Herramientas y Equipos de Seguridad</h3>
+            {% if pdf_mode %}
+                <img src="file:///{{ (app_root ~ '/static/uploads/' ~ tools_check['foto'])|replace('\\', '/') }}" alt="Foto adjunta Herramientas y Equipos de Seguridad" class="foto-adjunta">
+            {% else %}
+                <img src="{{ url_for('uploaded_file', filename=tools_check['foto']) }}" alt="Foto adjunta Herramientas y Equipos de Seguridad" class="foto-adjunta">
+            {% endif %}
+        </div>
+        {% endif %}
+        {% if nc_daily or nc_tools %}
+        <h3 style="color:#b91c1c;">Ítems No Cumplidos</h3>
+        {% if nc_daily %}
+        <h4 style="margin-bottom:6px;">Checklist Diario</h4>
+        <ul>
+            {% for desc in nc_daily %}
+            <li>{{ desc }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% if nc_tools %}
+        <h4 style="margin-bottom:6px;">Herramientas y Equipos de Seguridad</h4>
+        <ul>
+            {% for desc in nc_tools %}
+            <li>{{ desc }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endif %}
+        <h3>Resumen de Cumplimiento</h3>
+        <table>
+            <thead>
+                <tr><th>Grupo</th><th style="text-align:center;">Cumplimiento</th></tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Checklist Diario</td>
+                {% if nc_daily and nc_daily|length > 0 %}
+                <td class="nocumple" style="text-align:center;">No cumple</td>
+                {% else %}
+                <td class="cumple" style="text-align:center;">Cumple</td>
+                {% endif %}
+            </tr>
+            {% for gc in group_compliance %}
+                <tr>
+                    <td>{{ gc.group_name }}</td>
+                    <td style="text-align:center;" class="{% if gc.compliance_status == 'Cumple' %}cumple{% elif gc.compliance_status == 'No cumple' %}nocumple{% else %}noaplica{% endif %}">{{ gc.compliance_status }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% if not pdf_mode %}
+        <div style="margin-top: 20px;">
+            <a href="{{ url_for('index') }}" style="background: linear-gradient(90deg, #3182ce 0%, #63b3ed 100%); color: #fff; padding: 8px 18px; border-radius: 6px; margin-right: 10px; text-decoration: none; font-weight: 600;">Volver al Formulario</a>
+            <a href="{{ url_for('all_reports') }}" style="background: linear-gradient(90deg, #3182ce 0%, #63b3ed 100%); color: #fff; padding: 8px 18px; border-radius: 6px; text-decoration: none; font-weight: 600;">Ver Todos los Reportes</a>
+            <a href="{{ url_for('report_pdf', submission_id=submission.id) }}" style="background: linear-gradient(90deg, #38a169 0%, #68d391 100%); color: #fff; padding: 8px 18px; border-radius: 6px; text-decoration: none; font-weight: 600; margin-left: 10px;">Descargar PDF</a>
+        </div>
+        {% endif %}
+        <div class="footer">
+            Reporte generado el {{ created_at.strftime('%d/%m/%Y %H:%M:%S') }}<br>
+            Sistema de Gestión de Empresas
+        </div>
+    </div>
+</body>
+</html>

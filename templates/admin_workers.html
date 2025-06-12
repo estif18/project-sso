@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Administrar Trabajadores</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Trabajadores</h1>
+    <form method="POST" style="max-width:400px;margin:auto;">
+        <label for="name">Nombre del trabajador:</label>
+        <input type="text" id="name" name="name" required>
+        <label for="company_id">Empresa:</label>
+        <select id="company_id" name="company_id" required>
+            <option value="">Seleccione una empresa</option>
+            {% for company in companies %}
+            <option value="{{ company.id }}">{{ company.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Agregar Trabajador</button>
+    </form>
+    <h2 style="text-align:center;">Lista de Trabajadores</h2>
+    <form method="get" style="max-width:800px;margin:20px auto;display:flex;gap:16px;align-items:center;justify-content:center;flex-wrap:wrap;">
+        <label for="company_id">Empresa:</label>
+        <select name="company_id" id="company_id" onchange="this.form.submit()">
+            <option value="">Todas</option>
+            {% for company in companies %}
+            <option value="{{ company.id }}" {% if selected_company and company.id == selected_company %}selected{% endif %}>{{ company.name }}</option>
+            {% endfor %}
+        </select>
+        <label for="search">Nombre:</label>
+        <input type="text" name="search" id="search" value="{{ search_query or '' }}" placeholder="Buscar por nombre" oninput="this.form.submit()" style="min-width:120px;">
+        <noscript><button type="submit">Filtrar</button></noscript>
+    </form>
+    <table class="admin-table" style="margin:auto;max-width:800px;width:100%;border-collapse:collapse;">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Empresa</th>
+                <th>Editar</th>
+                <th>Eliminar</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for worker in workers %}
+            <tr>
+                <td>{{ worker.name }}</td>
+                <td>{{ worker.company.name }}</td>
+                <td><a href="{{ url_for('edit_worker', worker_id=worker.id) }}">Editar</a></td>
+                <td>
+                    <form action="{{ url_for('delete_worker', worker_id=worker.id) }}" method="post" style="display:inline;">
+                        <button type="submit" onclick="return confirm('¿Seguro que deseas eliminar este trabajador?');" style="color:#e53e3e; background:none; border:none; text-decoration:underline; cursor:pointer;">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% if edit_worker %}
+    <hr>
+    <h3>Editar Trabajador</h3>
+    <form method="POST" style="max-width:400px;margin:auto;">
+        <label for="name">Nombre del trabajador:</label>
+        <input type="text" id="name" name="name" value="{{ edit_worker.name }}" required>
+        <label for="company_id">Empresa:</label>
+        <select id="company_id" name="company_id" required>
+            <option value="">Seleccione una empresa</option>
+            {% for company in companies %}
+            <option value="{{ company.id }}" {% if company.id == edit_worker.company_id %}selected{% endif %}>{{ company.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Guardar Cambios</button>
+    </form>
+    {% endif %}
+    <div style="text-align:center;margin-top:20px;">
+        <a href="/admin/companies">Administrar Empresas</a>
+        <a href="/">Volver al Formulario</a>
+    </div>
+</body>
+</html>

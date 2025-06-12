@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Chequeo de Herramientas y Equipos de Seguridad</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: 'Segoe UI', 'Arial', 'Helvetica Neue', Helvetica, sans-serif;
+            background: #f8f9fa;
+            color: #222;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            color: #1a202c;
+            font-size: 2em;
+            margin-top: 32px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid #3182ce;
+            padding-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+        form {
+            background: #fff;
+            max-width: 950px;
+            margin: 0 auto 32px auto;
+            padding: 36px 40px 28px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+            border: 1px solid #e2e8f0;
+        }
+        .checklist-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 22px;
+            background: #f9fafb;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+        }
+        .checklist-table th, .checklist-table td {
+            border: 1px solid #cbd5e1;
+            padding: 10px 14px;
+            text-align: left;
+        }
+        .checklist-table th {
+            background: #e2e8f0;
+            font-weight: 700;
+            color: #2d3748;
+        }
+        .checklist-section-title {
+            background: #3182ce !important;
+            color: #fff !important;
+            font-weight: 700;
+            font-size: 1.08em;
+            padding: 8px 14px;
+            border-radius: 6px 6px 0 0;
+            margin-bottom: 0;
+            letter-spacing: 0.5px;
+        }
+        .checklist-label {
+            text-align: left;
+            font-size: 1.08em;
+            min-width: 320px;
+        }
+        .checklist-btns {
+            display: flex;
+            flex-direction: row;
+            gap: 32px;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        .checklist-btns label {
+            margin: 0;
+            font-size: 1.08em;
+            min-width: 48px;
+            display: flex;
+            align-items: center;
+        }
+        textarea, input[type="date"], input[type="file"] {
+            font-size: 1em;
+            border-radius: 5px;
+            border: 1px solid #cbd5e1;
+            padding: 7px 10px;
+            margin-top: 6px;
+        }
+        textarea {
+            resize: vertical;
+        }
+        button[type="submit"] {
+            background: linear-gradient(90deg, #3182ce 0%, #63b3ed 100%);
+            color: #fff;
+            padding: 12px 32px;
+            border-radius: 6px;
+            font-size: 1.15em;
+            font-weight: 600;
+            border: none;
+            box-shadow: 0 2px 8px #b6c2d1;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button[type="submit"]:hover {
+            background: linear-gradient(90deg, #2563eb 0%, #4299e1 100%);
+        }
+        label[for], .checklist-label {
+            font-weight: 600;
+        }
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 18px;
+        }
+        .header-flex .logo-header img {
+            height: 64px;
+            margin-left: 24px;
+        }
+        @media (max-width: 700px) {
+            form { padding: 18px 4vw; }
+            .checklist-label { min-width: 120px; font-size: 1em; }
+            .logo-header { right: 10px; top: 10px; width: 120px; }
+            .header-flex .logo-header img { height: 44px; margin-left: 8px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header-flex">
+        <div>
+            <h1 style="margin-bottom:0; border-bottom:none; padding-bottom:0;">Chequeo de Herramientas y Equipos de Seguridad</h1>
+        </div>
+        <div class="logo-header">
+            <img src="{{ url_for('static', filename='logo-minera.png') }}" alt="Minera Santa Luisa">
+        </div>
+    </div>
+    <form method="POST" enctype="multipart/form-data">
+    <table class="checklist-table">
+        <thead>
+            <tr><th colspan="4" class="checklist-section-title">Herramientas y Equipos de Seguridad</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="checklist-label">GATA Y LLAVE DE RUEDAS*</td>
+                <td class="checklist-btns" colspan="3">
+                    <label><input type="radio" name="herr_item1" value="C" required> C</label>
+                    <label><input type="radio" name="herr_item1" value="NC"> NC</label>
+                    <label><input type="radio" name="herr_item1" value="NA"> NA</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="checklist-label">CINTA REFLECTIVA</td>
+                <td class="checklist-btns" colspan="3">
+                    <label><input type="radio" name="herr_item2" value="C" required> C</label>
+                    <label><input type="radio" name="herr_item2" value="NC"> NC</label>
+                    <label><input type="radio" name="herr_item2" value="NA"> NA</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="checklist-label">LLANTA DE REPUESTO*:</td>
+                <td colspan="3">
+                    <div class="checklist-btns">
+                        <label><input type="radio" name="herr_item3" value="C" required> C</label>
+                        <label><input type="radio" name="herr_item3" value="NC"> NC</label>
+                        <label><input type="radio" name="herr_item3" value="NA"> NA</label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="checklist-label">EXTINTOR:</td>
+                <td colspan="3">
+                    <div class="checklist-btns">
+                        <label><input type="radio" name="herr_item4" value="C" required> C</label>
+                        <label><input type="radio" name="herr_item4" value="NC"> NC</label>
+                        <label><input type="radio" name="herr_item4" value="NA"> NA</label>
+                    </div>
+                </td>
+            </tr>
+            <tr id="extintor_fecha_row">
+                <td class="checklist-label">FECHA VENCIMIENTO EXTINTOR:</td>
+                <td colspan="3">
+                    <input type="date" name="herr_extintor_fecha" id="herr_extintor_fecha" style="width:170px; display:inline-block;">
+                </td>
+            </tr>
+            <tr>
+                <td class="checklist-label">TRIANGULO DE SEGURIDAD / CONOS DE SEGURIDAD</td>
+                <td class="checklist-btns" colspan="3">
+                    <label><input type="radio" name="herr_item5" value="C" required> C</label>
+                    <label><input type="radio" name="herr_item5" value="NC"> NC</label>
+                    <label><input type="radio" name="herr_item5" value="NA"> NA</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="checklist-label">BOTIQUIN:</td>
+                <td colspan="3">
+                    <div class="checklist-btns">
+                        <label><input type="radio" name="herr_item6" value="C" required> C</label>
+                        <label><input type="radio" name="herr_item6" value="NC"> NC</label>
+                        <label><input type="radio" name="herr_item6" value="NA"> NA</label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="checklist-label">PAÑO ABSORVENTE</td>
+                <td class="checklist-btns" colspan="3">
+                    <label><input type="radio" name="herr_item7" value="C" required> C</label>
+                    <label><input type="radio" name="herr_item7" value="NC"> NC</label>
+                    <label><input type="radio" name="herr_item7" value="NA"> NA</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="checklist-label">TACO VIAL DE SEGURIDAD PARA VEHÍCULOS (2 UND)*</td>
+                <td class="checklist-btns" colspan="3">
+                    <label><input type="radio" name="herr_item8" value="C" required> C</label>
+                    <label><input type="radio" name="herr_item8" value="NC"> NC</label>
+                    <label><input type="radio" name="herr_item8" value="NA"> NA</label>
+                </td>
+            </tr>
+            <tr><th colspan="4" class="checklist-section-title">Chequeo de Kit Antiderrames</th></tr>
+            {% if asset.type in ['CAMIONETA', 'AMBULANCIA'] %}
+            <tr>
+                <td class="checklist-label">12 PAÑOS ABSORBENTES DE HIDROCARBUROS</td>
+                <td class="checklist-btns" colspan="3">
+                    <label><input type="radio" name="kit_panos" value="C" required> C</label>
+                    <label><input type="radio" name="kit_panos" value="NC"> NC</label>
+                    <label><input type="radio" name="kit_panos" value="NA"> NA</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="checklist-label">1 PICO</td>
+                <td class="checklist-btns" colspan="3">
+                    <label><input type="radio" name="kit_pico" value="C" required> C</label>
+                    <label><input type="radio" name="kit_pico" value="NC"> NC</label>
+                    <label><input type="radio" name="kit_pico" value="NA"> NA</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="checklist-label">1 LAMPA</td>
+                <td class="checklist-btns" colspan="3">
+                    <label><input type="radio" name="kit_lampa" value="C" required> C</label>
+                    <label><input type="radio" name="kit_lampa" value="NC"> NC</label>
+                    <label><input type="radio" name="kit_lampa" value="NA"> NA</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="checklist-label">5 COSTALES (PARA RECOGER LA TIERRA CONTAMINADA, UN PESO MÁXIMO DE 25 KG)</td>
+                <td class="checklist-btns" colspan="3">
+                    <label><input type="radio" name="kit_costales" value="C" required> C</label>
+                    <label><input type="radio" name="kit_costales" value="NC"> NC</label>
+                    <label><input type="radio" name="kit_costales" value="NA"> NA</label>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td class="checklist-label">24 PAÑOS ABSORBENTES DE HIDROCARBUROS</td>
+                <td class="checklist-btns" colspan="3">
+                    <label><input type="radio" name="kit_panos" value="C" required> C</label>
+                    <label><input type="radio" name="kit_panos" value="NC"> NC</label>
+                    <label><input type="radio" name="kit_panos" value="NA"> NA</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="checklist-label">1 SALCHICHA ABSORBENTE GRANDE (2.70 METROS DE LARGO)</td>
+                <td class="checklist-btns" colspan="3">
+                    <label><input type="radio" name="kit_salchicha" value="C" required> C</label>
+                    <label><input type="radio" name="kit_salchicha" value="NC"> NC</label>
+                    <label><input type="radio" name="kit_salchicha" value="NA"> NA</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="checklist-label">1 PICO</td>
+                <td class="checklist-btns" colspan="3">
+                    <label><input type="radio" name="kit_pico" value="C" required> C</label>
+                    <label><input type="radio" name="kit_pico" value="NC"> NC</label>
+                    <label><input type="radio" name="kit_pico" value="NA"> NA</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="checklist-label">1 LAMPA</td>
+                <td class="checklist-btns" colspan="3">
+                    <label><input type="radio" name="kit_lampa" value="C" required> C</label>
+                    <label><input type="radio" name="kit_lampa" value="NC"> NC</label>
+                    <label><input type="radio" name="kit_lampa" value="NA"> NA</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="checklist-label">1 BANDEJA ANTIDERRAME</td>
+                <td class="checklist-btns" colspan="3">
+                    <label><input type="radio" name="kit_bandeja" value="C" required> C</label>
+                    <label><input type="radio" name="kit_bandeja" value="NC"> NC</label>
+                    <label><input type="radio" name="kit_bandeja" value="NA"> NA</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="checklist-label">10 COSTALES (PARA RECOGER LA TIERRA CONTAMINADA, UN PESO MÁXIMO DE 25 KG)</td>
+                <td class="checklist-btns" colspan="3">
+                    <label><input type="radio" name="kit_costales" value="C" required> C</label>
+                    <label><input type="radio" name="kit_costales" value="NC"> NC</label>
+                    <label><input type="radio" name="kit_costales" value="NA"> NA</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="checklist-label">2 TACOS O TARUGOS DE MADERA</td>
+                <td class="checklist-btns" colspan="3">
+                    <label><input type="radio" name="kit_tacos" value="C" required> C</label>
+                    <label><input type="radio" name="kit_tacos" value="NC"> NC</label>
+                    <label><input type="radio" name="kit_tacos" value="NA"> NA</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="checklist-label">2 TRAJES TYBEK</td>
+                <td class="checklist-btns" colspan="3">
+                    <label><input type="radio" name="kit_trajes" value="C" required> C</label>
+                    <label><input type="radio" name="kit_trajes" value="NC"> NC</label>
+                    <label><input type="radio" name="kit_trajes" value="NA"> NA</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="checklist-label">1 PAR DE GUANTES</td>
+                <td class="checklist-btns" colspan="3">
+                    <label><input type="radio" name="kit_guantes" value="C" required> C</label>
+                    <label><input type="radio" name="kit_guantes" value="NC"> NC</label>
+                    <label><input type="radio" name="kit_guantes" value="NA"> NA</label>
+                </td>
+            </tr>
+            {% endif %}
+            <!-- Grupo Otros -->
+            <tr><th colspan="4" class="checklist-section-title">Otros</th></tr>
+            <tr>
+                <td class="checklist-label">SOAT</td>
+                <td class="checklist-btns" colspan="2">
+                    <label><input type="radio" name="otros_soat" value="C" required> C</label>
+                    <label><input type="radio" name="otros_soat" value="NC"> NC</label>
+                    <label><input type="radio" name="otros_soat" value="NA"> NA</label>
+                </td>
+                <td></td>
+            </tr>
+            <tr id="soat_fecha_row">
+                <td class="checklist-label">FECHA VENCIMIENTO SOAT:</td>
+                <td colspan="3">
+                    <input type="date" name="otros_soat_fecha" id="otros_soat_fecha" style="width:150px;">
+                </td>
+            </tr>
+            <tr>
+                <td class="checklist-label">Tarjeta de propiedad</td>
+                <td class="checklist-btns" colspan="3">
+                    <label><input type="radio" name="otros_propiedad" value="C" required> C</label>
+                    <label><input type="radio" name="otros_propiedad" value="NC"> NC</label>
+                    <label><input type="radio" name="otros_propiedad" value="NA"> NA</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="checklist-label">Tarjeta de circulación</td>
+                <td class="checklist-btns" colspan="3">
+                    <label><input type="radio" name="otros_circulacion" value="C" required> C</label>
+                    <label><input type="radio" name="otros_circulacion" value="NC"> NC</label>
+                    <label><input type="radio" name="otros_circulacion" value="NA"> NA</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="checklist-label">Licencia de conducir</td>
+                <td class="checklist-btns" colspan="3">
+                    <label><input type="radio" name="otros_licencia" value="C" required> C</label>
+                    <label><input type="radio" name="otros_licencia" value="NC"> NC</label>
+                    <label><input type="radio" name="otros_licencia" value="NA"> NA</label>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <!-- Observaciones adicionales y adjuntar foto -->
+    <div style="max-width:900px;margin:24px auto 0 auto;">
+        <label for="observaciones" style="font-weight:bold;">Observaciones adicionales:</label><br>
+        <textarea id="observaciones" name="observaciones" rows="3" style="width:100%;max-width:900px;margin-bottom:12px;"></textarea>
+        <br>
+        <label for="foto" style="font-weight:bold;">Adjuntar foto (opcional):</label><br>
+        <input type="file" id="foto" name="foto" accept="image/*" style="margin-bottom:18px;">
+    </div>
+    <div style="text-align:center;margin:24px 0;">
+        <button type="submit" style="background: linear-gradient(90deg, #3182ce 0%, #63b3ed 100%); color: #fff; padding: 10px 28px; border-radius: 6px; font-size: 1.1em; font-weight: 600; border:none;">Guardar Chequeo</button>
+    </div>
+    </form>
+    <script>
+function toggleFechaRow(radioName, rowId, inputId) {
+    var radios = document.getElementsByName(radioName);
+    var fechaRow = document.getElementById(rowId);
+    let checkedValue = '';
+    for (let i = 0; i < radios.length; i++) {
+        if (radios[i].checked) {
+            checkedValue = radios[i].value;
+            break;
+        }
+    }
+    if (checkedValue === 'C') {
+        fechaRow.style.display = '';
+    } else {
+        fechaRow.style.display = 'none';
+        document.getElementById(inputId).value = '';
+    }
+}
+window.onload = function() {
+    // EXTINTOR
+    var radiosExt = document.getElementsByName('herr_item4');
+    for (let i = 0; i < radiosExt.length; i++) {
+        radiosExt[i].addEventListener('change', function() { toggleFechaRow('herr_item4', 'extintor_fecha_row', 'herr_extintor_fecha'); });
+    }
+    toggleFechaRow('herr_item4', 'extintor_fecha_row', 'herr_extintor_fecha');
+    // SOAT
+    var radiosSoat = document.getElementsByName('otros_soat');
+    for (let i = 0; i < radiosSoat.length; i++) {
+        radiosSoat[i].addEventListener('change', function() { toggleFechaRow('otros_soat', 'soat_fecha_row', 'otros_soat_fecha'); });
+    }
+    toggleFechaRow('otros_soat', 'soat_fecha_row', 'otros_soat_fecha');
+};
+</script>
+</body>
+</html>

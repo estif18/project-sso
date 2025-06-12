@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todos los Reportes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .cumple-td { font-weight: bold; color: green; }
+        .nocumple-td { font-weight: bold; color: red; }
+        .noaplica-td { font-weight: bold; color: gray; }
+    </style>
+</head>
+<body>
+    <h1>Vista Previa de Todos los Reportes</h1>
+    <form method="get" style="max-width:900px;margin:20px auto 30px auto;display:flex;gap:16px;flex-wrap:wrap;align-items:center;">
+        <label for="company_id">Empresa:</label>
+        <select name="company_id" id="company_id" onchange="this.form.submit()">
+            <option value="">Todas</option>
+            {% for company in all_companies %}
+            <option value="{{ company.id }}" {% if selected_company and company.id == selected_company %}selected{% endif %}>{{ company.name }}</option>
+            {% endfor %}
+        </select>
+        <label for="asset_id">Equipo:</label>
+        <select name="asset_id" id="asset_id" onchange="this.form.submit()">
+            <option value="">Todos</option>
+            {% for asset in all_assets %}
+                {% if not selected_company or asset.company_id == selected_company %}
+                <option value="{{ asset.id }}" {% if selected_asset and asset.id == selected_asset %}selected{% endif %}>{{ asset.type }} - {{ asset.code }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+        <label for="worker_id">Trabajador:</label>
+        <select name="worker_id" id="worker_id" onchange="this.form.submit()">
+            <option value="">Todos</option>
+            {% for worker in all_workers %}
+                {% if not selected_company or worker.company_id == selected_company %}
+                <option value="{{ worker.id }}" {% if selected_worker and worker.id == selected_worker %}selected{% endif %}>{{ worker.name }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+        <noscript><button type="submit">Filtrar</button></noscript>
+    </form>
+    <div style="overflow-x:auto;">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Empresa</th>
+                <th>Trabajador</th>
+                <th>Tipo de Equipo</th>
+                <th>Placa/Código</th>
+                <th>Fecha y Hora</th>
+                <th>Resumen Cumplimiento</th>
+                <th>Detalle por Grupo</th>
+                <th>Ver Detalle</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for submission in submissions %}
+            {% set checklist = submission.daily_checklist.to_dict() if submission.daily_checklist else {} %}
+            {% set tools_check = submission.tools_check.to_dict() if submission.tools_check else {} %}
+            {% set cumple = 'Cumple' %}
+            {% for v in checklist.values() %}
+                {% if v == 'NC' %}
+                    {% set cumple = 'No cumple' %}
+                {% endif %}
+            {% endfor %}
+            {% for v in tools_check.values() %}
+                {% if v == 'NC' %}
+                    {% set cumple = 'No cumple' %}
+                {% endif %}
+            {% endfor %}
+            <tr>
+                <td>{{ submission.id }}</td>
+                <td>{{ companies[submission.company_id] }}</td>
+                <td>{{ workers[submission.worker_id] }}</td>
+                <td>{{ submission.asset.type }}</td>
+                <td>{{ submission.asset.code }}</td>
+                <td>{{ submission.created_at.strftime('%d/%m/%Y %H:%M') if submission.created_at else '' }}</td>
+                {% set diario_keys = [] %}
+                {% for i in range(0, 20) %}
+                    {% set _ = diario_keys.append('item' ~ i) %}
+                {% endfor %}
+                {% set general_apagado_keys = [] %}
+                {% for i in range(1, 20) %}
+                    {% set _ = general_apagado_keys.append('item' ~ i) %}
+                {% endfor %}
+                {% set general_encendido_keys = [] %}
+                {% for i in range(1, 10) %}
+                    {% set _ = general_encendido_keys.append('item' ~ (100+i)) %}
+                {% endfor %}
+                {% set cargador_keys = [] %}
+                {% for i in range(1, 7) %}
+                    {% set _ = cargador_keys.append('item' ~ (200+i)) %}
+                {% endfor %}
+                {% set rodillo_keys = [] %}
+                {% for i in range(1, 3) %}
+                    {% set _ = rodillo_keys.append('item' ~ (300+i)) %}
+                {% endfor %}
+                {% set volquete_keys = [] %}
+                {% for i in range(1, 7) %}
+                    {% set _ = volquete_keys.append('item' ~ (400+i)) %}
+                {% endfor %}
+                {% set grua_keys = [] %}
+                {% for i in range(1, 3) %}
+                    {% set _ = grua_keys.append('item' ~ (500+i)) %}
+                {% endfor %}
+                {% set cisterna_keys = [] %}
+                {% for i in range(1, 3) %}
+                    {% set _ = cisterna_keys.append('item' ~ (600+i)) %}
+                {% endfor %}
+                {% set grupos_checklist = {
+                    'CHECKLIST DIARIO': diario_keys,
+                    'GENERAL (EQUIPO APAGADO)': general_apagado_keys,
+                    'GENERAL (MOTOR ENCENDIDO)': general_encendido_keys,
+                    'CARGADOR FRONTAL, RETROEXCAVADORA, EXCAVADORA, MONTACARGA, MINICARGADOR Y TRACTOR': cargador_keys,
+                    'RODILLO COMPACTADOR': rodillo_keys,
+                    'VOLQUETE': volquete_keys,
+                    'GRÚA': grua_keys,
+                    'CISTERNA Y UTILITARIO': cisterna_keys
+                } %}
+                {% set cumple_diario = 'Cumple' %}
+                {% set diario_vals = [] %}
+                {% for k in grupos_checklist['CHECKLIST DIARIO'] %}
+                    {% if checklist[k] is defined %}
+                        {% set _ = diario_vals.append(checklist[k]) %}
+                    {% endif %}
+                {% endfor %}
+                {% if diario_vals and diario_vals|select('equalto', 'NC')|list|length > 0 %}
+                    {% set cumple_diario = 'No cumple' %}
+                {% elif diario_vals and diario_vals|select('equalto', 'NA')|list|length == diario_vals|length %}
+                    {% set cumple_diario = 'No aplica' %}
+                {% endif %}
+                <td>
+                    {% set grupos = submission.grupos_no_cumple|list %}
+                    {% if cumple_diario == 'No cumple' and 'CHEQUEO DIARIO' not in grupos %}
+                        {% set _ = grupos.insert(0, 'CHEQUEO DIARIO') %}
+                    {% endif %}
+                    {% if cumple_diario == 'Cumple' and submission.resumen == 'Cumple' %}
+                        <span style="color:green;font-weight:bold;">Cumple</span>
+                    {% elif cumple_diario == 'No cumple' or submission.resumen == 'No cumple' %}
+                        <span style="color:red;font-weight:bold;">No cumple</span>
+                        <br><span style="font-size:0.98em;">No cumplen: {{ grupos|join(', ') }}</span>
+                    {% else %}
+                        <span style="color:gray;font-weight:bold;">No aplica</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <ul style="list-style-type:none;padding-left:0;">
+                        <li style="border-bottom:1px solid #bbb;padding-bottom:2px;margin-bottom:2px;"><b>CHECKLIST DIARIO:</b> <span class="{% if cumple_diario == 'Cumple' %}cumple-td{% elif cumple_diario == 'No cumple' %}nocumple-td{% else %}noaplica-td{% endif %}">{{ cumple_diario }}</span></li>
+                        {% for gc in submission.group_compliance %}
+                            {% if gc.group_name != 'CHECKLIST DIARIO' %}
+                            {% if gc.compliance_status == 'Cumple' %}
+                                {% set status_class = 'cumple-td' %}
+                            {% elif gc.compliance_status == 'No cumple' %}
+                                {% set status_class = 'nocumple-td' %}
+                            {% else %}
+                                {% set status_class = 'noaplica-td' %}
+                            {% endif %}
+                            <li><b>{{ gc.group_name }}:</b> <span class="{{ status_class }}">{{ gc.compliance_status }}</span></li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </td>
+                <td><a href="{{ url_for('report', submission_id=submission.id) }}" style="background: linear-gradient(90deg, #3182ce 0%, #63b3ed 100%); color: #fff; padding: 6px 14px; border-radius: 6px; text-decoration: none; font-weight: 600;">Ver</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    <div style="text-align:center; margin-top: 20px;">
+        <a href="{{ url_for('index') }}" style="background: linear-gradient(90deg, #3182ce 0%, #63b3ed 100%); color: #fff; padding: 8px 18px; border-radius: 6px; text-decoration: none; font-weight: 600;">Volver al Formulario</a>
+    </div>
+</body>
+</html>

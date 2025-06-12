@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Collection Form</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: 'Segoe UI', 'Arial', 'Helvetica Neue', Helvetica, sans-serif;
+            background: #f8f9fa;
+            color: #222;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            color: #1a202c;
+            font-size: 2em;
+            margin-top: 32px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid #3182ce;
+            padding-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+        form {
+            background: #fff;
+            max-width: 500px;
+            margin: 0 auto 32px auto;
+            padding: 36px 40px 28px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+            border: 1px solid #e2e8f0;
+        }
+        label {
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: block;
+        }
+        select, input[type="text"] {
+            width: 100%;
+            padding: 9px 12px;
+            border-radius: 5px;
+            border: 1px solid #cbd5e1;
+            font-size: 1em;
+            margin-bottom: 16px;
+            background: #f9fafb;
+        }
+        button[type="submit"] {
+            background: linear-gradient(90deg, #3182ce 0%, #63b3ed 100%);
+            color: #fff;
+            padding: 12px 32px;
+            border-radius: 6px;
+            font-size: 1.15em;
+            font-weight: 600;
+            border: none;
+            box-shadow: 0 2px 8px #b6c2d1;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button[type="submit"]:hover {
+            background: linear-gradient(90deg, #2563eb 0%, #4299e1 100%);
+        }
+        .autocomplete-wrapper {
+            position: relative;
+        }
+        .autocomplete-list {
+            position: absolute;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            background: #fff;
+            border: 1px solid #cbd5e1;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            box-shadow: 0 2px 8px #b6c2d1;
+            max-height: 180px;
+            overflow-y: auto;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .autocomplete-list li {
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+        .autocomplete-list li:hover, .autocomplete-list li.active {
+            background: #e2e8f0;
+        }
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 18px;
+        }
+        .header-flex .logo-header img {
+            height: 64px;
+            margin-left: 24px;
+        }
+        @media (max-width: 700px) {
+            form { padding: 18px 4vw; }
+            .header-flex .logo-header img { height: 44px; margin-left: 8px; }
+        }
+    </style>
+</head>
+<body>
+    <form method="POST">
+        <div class="header-flex">
+            <div>
+                <h1 style="margin-bottom:0; border-bottom:none; padding-bottom:0;">Data Collection Form</h1>
+            </div>
+            <div class="logo-header">
+                <img src="{{ url_for('static', filename='logo-minera.png') }}" alt="Minera Santa Luisa">
+            </div>
+        </div>
+            <label for="company">Empresa:</label><br>
+            <select id="company" name="company" required>
+                <option value="">Seleccione una empresa</option>
+                {% for company in companies %}
+                <option value="{{ company.id }}">{{ company.name }}</option>
+                {% endfor %}
+            </select><br><br>
+            <label for="worker_name">Trabajador:</label><br>
+            <div class="autocomplete-wrapper" style="max-width:300px;">
+              <input type="text" id="worker_name" name="worker_name" autocomplete="off" required placeholder="Buscar trabajador...">
+              <ul id="worker_suggestions" class="autocomplete-list" style="display:none;"></ul>
+            </div>
+            <br><br>
+            <label for="asset_type">Tipo de equipo:</label><br>
+            <select id="asset_type" name="asset_type" required disabled>
+                <option value="">Seleccione una empresa primero</option>
+            </select><br><br>
+            <label for="asset_code">Placa/Código:</label><br>
+            <select id="asset_code" name="asset_code" required disabled>
+                <option value="">Seleccione un tipo de equipo primero</option>
+            </select><br><br>
+            <button type="submit">Enviar</button>
+        </form>
+        <div style="text-align:center; margin-top: 20px;">
+            <a href="{{ url_for('all_reports') }}" style="background: linear-gradient(90deg, #3182ce 0%, #63b3ed 100%); color: #fff; padding: 8px 18px; border-radius: 6px; text-decoration: none; font-weight: 600;">Ver Todos los Reportes</a>
+        </div>
+        <script src="{{ url_for('static', filename='autocomplete.js') }}"></script>
+        <script>
+        const companySelect = document.getElementById('company');
+        const assetTypeSelect = document.getElementById('asset_type');
+        const assetCodeSelect = document.getElementById('asset_code');
+        const workerInput = document.getElementById('worker_name');
+        const suggestionsList = document.getElementById('worker_suggestions');
+        let selectedWorkerId = null;
+        let currentWorkerList = [];
+
+        function resetAssetFields() {
+            assetTypeSelect.innerHTML = '<option value="">Seleccione una empresa primero</option>';
+            assetTypeSelect.disabled = true;
+            assetCodeSelect.innerHTML = '<option value="">Seleccione un tipo de equipo primero</option>';
+            assetCodeSelect.disabled = true;
+        }
+
+        companySelect.addEventListener('change', function() {
+            workerInput.value = '';
+            suggestionsList.innerHTML = '';
+            suggestionsList.style.display = 'none';
+            selectedWorkerId = null;
+            workerInput.disabled = !companySelect.value;
+            // Limpiar y deshabilitar campos dependientes
+            resetAssetFields();
+            const workerSelect = document.getElementById('worker_name');
+            workerSelect.innerHTML = '<option value="">Cargando...</option>';
+            workerSelect.disabled = true;
+
+            if (companySelect.value) {
+                // Cargar trabajadores de la empresa seleccionada
+                fetch('/get_workers', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ company: companySelect.value })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    workerSelect.innerHTML = '';
+                    if (data.workers.length > 0) {
+                        data.workers.forEach(worker => {
+                            const opt = document.createElement('option');
+                            opt.value = worker;
+                            opt.textContent = worker;
+                            workerSelect.appendChild(opt);
+                        });
+                        workerSelect.disabled = false;
+                    } else {
+                        workerSelect.innerHTML = '<option value="">No hay trabajadores</option>';
+                        workerSelect.disabled = true;
+                    }
+                });
+
+                // Cargar tipos de activos
+                fetch('/get_assets', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ company_id: companySelect.value })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const types = [...new Set(data.assets.map(a => a.type))];
+                    assetTypeSelect.innerHTML = '<option value="">Seleccione tipo de equipo</option>';
+                    types.forEach(type => {
+                        const opt = document.createElement('option');
+                        opt.value = type;
+                        opt.textContent = type;
+                        assetTypeSelect.appendChild(opt);
+                    });
+                    assetTypeSelect.disabled = false;
+                });
+
+                // Cargar trabajadores de la empresa seleccionada para validación
+                fetch('/get_workers', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ company: companySelect.value })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    currentWorkerList = data.workers.map(w => w.toLowerCase());
+                });
+            }
+        });
+
+        workerInput.addEventListener('input', function() {
+            const query = this.value;
+            const companyId = companySelect.value;
+            if (!companyId || query.length < 1) {
+                suggestionsList.innerHTML = '';
+                suggestionsList.style.display = 'none';
+                return;
+            }
+            fetch('/search_workers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ company_id: companyId, query })
+            })
+            .then(response => response.json())
+            .then(data => {
+                suggestionsList.innerHTML = '';
+                if (data.workers.length > 0) {
+                    data.workers.forEach(worker => {
+                        const li = document.createElement('li');
+                        li.textContent = worker.name;
+                        li.dataset.workerId = worker.id;
+                        li.addEventListener('mousedown', function(e) {
+                            workerInput.value = worker.name;
+                            selectedWorkerId = worker.id;
+                            suggestionsList.innerHTML = '';
+                            suggestionsList.style.display = 'none';
+                        });
+                        suggestionsList.appendChild(li);
+                    });
+                    suggestionsList.style.display = 'block';
+                } else {
+                    suggestionsList.style.display = 'none';
+                }
+            });
+        });
+
+        workerInput.addEventListener('blur', function() {
+            setTimeout(() => { suggestionsList.style.display = 'none'; }, 150);
+        });
+
+        assetTypeSelect.addEventListener('change', function() {
+            assetCodeSelect.innerHTML = '<option value="">Seleccione un tipo de equipo primero</option>';
+            assetCodeSelect.disabled = true;
+            const companyId = companySelect.value;
+            const type = assetTypeSelect.value;
+            if (companyId && type) {
+                fetch('/get_assets', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ company_id: companyId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const codes = data.assets.filter(a => a.type === type);
+                    assetCodeSelect.innerHTML = '<option value="">Seleccione placa/código</option>';
+                    codes.forEach(asset => {
+                        const opt = document.createElement('option');
+                        opt.value = asset.code;
+                        opt.textContent = asset.code;
+                        assetCodeSelect.appendChild(opt);
+                    });
+                    assetCodeSelect.disabled = false;
+                });
+            }
+        });
+
+        // Validar que el trabajador, tipo y placa/código existen antes de enviar
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(e) {
+            const companyId = companySelect.value;
+            const workerValue = workerInput.value.trim().toLowerCase();
+            let validWorker = false;
+            if (companyId && workerValue) {
+                validWorker = currentWorkerList.includes(workerValue);
+            }
+            if (!workerValue || !companyId || !assetTypeSelect.value || !assetCodeSelect.value || !validWorker) {
+                e.preventDefault();
+                alert('TRABAJADOR NO ENCONTRADO, SELECCIONE A UN TRABAJADOR REGISTRADO');
+                return false;
+            }
+        });
+        </script>
+    </body>
+</html>

@@ -292,19 +292,15 @@
 
         // Validar que el trabajador, tipo y placa/código existen antes de enviar
         const form = document.querySelector('form');
-        form.addEventListener('submit', function(e) {
-            const companyId = companySelect.value;
-            const workerValue = workerInput.value.trim().toLowerCase();
-            let validWorker = false;
-            if (companyId && workerValue) {
-                validWorker = currentWorkerList.includes(workerValue);
-            }
-            if (!workerValue || !companyId || !assetTypeSelect.value || !assetCodeSelect.value || !validWorker) {
-                e.preventDefault();
-                alert('TRABAJADOR NO ENCONTRADO, SELECCIONE A UN TRABAJADOR REGISTRADO');
-                return false;
-            }
-        });
+form.addEventListener('submit', function(e) {
+    const companyId = companySelect.value;
+    const workerValue = workerInput.value;
+    if (!workerValue || !companyId || !assetTypeSelect.value || !assetCodeSelect.value) {
+        e.preventDefault();
+        alert('TRABAJADOR NO ENCONTRADO, SELECCIONE A UN TRABAJADOR REGISTRADO');
+        return false;
+    }
+});
         </script>
     </body>
 </html>

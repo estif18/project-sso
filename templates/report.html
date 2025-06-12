@@ -175,7 +175,13 @@
                 'item201': 'UÑAS Y CADENA DE LEVANTE',
                 'item202': 'BRAZO DE SOPORTE',
                 'item203': 'AJUSTE DE CADENAS Y ESTADO DEL TEMPLADOR',
-                       <img src="file:///{{ app_root }}/static/uploads/{{ checklist['foto'] }}" alt="Foto adjunta Checklist Diario" class="foto-adjunta">
+                       {% if daily_checklist and daily_checklist.foto %}
+  {% if pdf_mode %}
+    <img src="file:///{{ app_root }}/static/uploads/{{ daily_checklist.foto }}" alt="Foto adjunta Checklist Diario" class="foto-adjunta">
+  {% else %}
+    <img src="{{ url_for('uploaded_file', filename=daily_checklist.foto) }}" alt="Foto adjunta Checklist Diario" class="foto-adjunta">
+  {% endif %}
+{% endif %}
                 ...
                 <img src="file:///{{ app_root }}/static/uploads/{{ tools_check['foto'] }}" alt="Foto adjunta Herramientas y Equipos de Seguridad" class="foto-adjunta">         'item204': 'ESTADO DE RUEDA GUÍA Y SPROCKET',
                 'item205': 'ESTADO DE CONTROL DE MANDOS ',

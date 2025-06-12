@@ -178,7 +178,7 @@
 <div class="foto-adjunta">
     <h3>Foto adjunta - Checklist Diario</h3>
     {% if pdf_mode %}
-        <img src="file:///{{ (app_root ~ '/static/uploads/' ~ daily_checklist.foto)|replace('\\', '/') }}" alt="Foto adjunta Checklist Diario" class="foto-adjunta">
+        <img src="file:///{{ (app_root ~ '/static/uploads/' ~ daily_checklist.foto)|replace('\\\\', '/') }}" alt="Foto adjunta Checklist Diario" class="foto-adjunta">
     {% else %}
         <img src="{{ url_for('uploaded_file', filename=daily_checklist.foto) }}" alt="Foto adjunta Checklist Diario" class="foto-adjunta">
     {% endif %}
@@ -188,7 +188,7 @@
 <div class="foto-adjunta">
     <h3>Foto adjunta - Herramientas y Equipos de Seguridad</h3>
     {% if pdf_mode %}
-        <img src="file:///{{ (app_root ~ '/static/uploads/' ~ tools_check.foto)|replace('\\', '/') }}" alt="Foto adjunta Herramientas y Equipos de Seguridad" class="foto-adjunta">
+        <img src="file:///{{ (app_root ~ '/static/uploads/' ~ tools_check.foto)|replace('\\\\', '/') }}" alt="Foto adjunta Herramientas y Equipos de Seguridad" class="foto-adjunta">
     {% else %}
         <img src="{{ url_for('uploaded_file', filename=tools_check.foto) }}" alt="Foto adjunta Herramientas y Equipos de Seguridad" class="foto-adjunta">
     {% endif %}

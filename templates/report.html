@@ -180,7 +180,7 @@
     {% if pdf_mode %}
        <img src="file:///{{ app_root }}/static/uploads/{{ daily_checklist.foto }}" alt="Foto adjunta Checklist Diario" class="foto-adjunta">
     {% else %}
-        <img src="{{ url_for('uploaded_file', filename=daily_checklist.foto) }}" alt="Foto adjunta Checklist Diario" class="foto-adjunta">
+        <img src="/uploads/{{ daily_checklist.foto }}" ...>
     {% endif %}
 </div>
 {% endif %}
@@ -190,7 +190,7 @@
     {% if pdf_mode %}
        <img src="file:///{{ app_root }}/static/uploads/{{ tools_check.foto }}" alt="Foto adjunta Herramientas y Equipos de Seguridad" class="foto-adjunta">
     {% else %}
-        <img src="{{ url_for('uploaded_file', filename=tools_check.foto) }}" alt="Foto adjunta Herramientas y Equipos de Seguridad" class="foto-adjunta">
+       <img src="/uploads/{{ tools_check.foto }}" ...>
     {% endif %}
 </div>
 {% endif %}        'item204': 'ESTADO DE RUEDA GUÍA Y SPROCKET',

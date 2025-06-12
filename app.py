@@ -192,7 +192,8 @@ def calcular_cumplimiento_grupo(respuestas, items):
 @app.route('/get_workers', methods=['POST'])
 def get_workers():
     company_id = request.json.get('company')
-    workers = Worker.query.filter_by(name=worker_name, company_id=company_id).first()
+    workers = Worker.query.filter_by(company_id=company_id).all()
+    worker = next((w for w in workers if w.name.strip().lower() == worker_name.strip().lower()), None)
     worker_list = [w.name for w in workers]
     return {"workers": worker_list}
 

@@ -124,6 +124,7 @@
             <div class="autocomplete-wrapper" style="max-width:300px;">
               <input type="text" id="worker_name" name="worker_name" autocomplete="off" required placeholder="Buscar trabajador...">
               <ul id="worker_suggestions" class="autocomplete-list" style="display:none;"></ul>
+                
             </div>
             <br><br>
             <label for="asset_type">Tipo de equipo:</label><br>
@@ -161,7 +162,6 @@
             suggestionsList.innerHTML = '';
             suggestionsList.style.display = 'none';
             selectedWorkerId = null;
-            workerInput.disabled = !companySelect.value;
             // Limpiar y deshabilitar campos dependientes
             resetAssetFields();
             const workerSelect = document.getElementById('worker_name');

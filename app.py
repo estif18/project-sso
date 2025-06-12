@@ -192,7 +192,12 @@ def calcular_cumplimiento_grupo(respuestas, items):
 @app.route('/get_workers', methods=['POST'])
 def get_workers():
     company_id = request.json.get('company')
-    workers = Worker.query.filter_by(company_id=company_id).all()
+    from sqlalchemy import func  # ensure this is imported
+
+worker = Worker.query.filter(
+    func.lower(func.trim(Worker.name)) == worker_name.strip().lower(),
+    Worker.company_id == company_id
+).first()
     worker_list = [w.name for w in workers]
     return {"workers": worker_list}
 

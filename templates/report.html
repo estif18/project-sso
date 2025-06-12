@@ -174,16 +174,26 @@
                 'item200': 'NIVEL DE ACEITE DE TRANSMISIÓN Y HIDRÁULICO',
                 'item201': 'UÑAS Y CADENA DE LEVANTE',
                 'item202': 'BRAZO DE SOPORTE',
-                'item203': 'AJUSTE DE CADENAS Y ESTADO DEL TEMPLADOR',
-                       {% if daily_checklist and daily_checklist.foto %}
-  {% if pdf_mode %}
-    <img src="file:///{{ app_root }}/static/uploads/{{ daily_checklist.foto }}" alt="Foto adjunta Checklist Diario" class="foto-adjunta">
-  {% else %}
-    <img src="{{ url_for('uploaded_file', filename=daily_checklist.foto) }}" alt="Foto adjunta Checklist Diario" class="foto-adjunta">
-  {% endif %}
+                'item2{% if daily_checklist and daily_checklist.foto %}
+<div class="foto-adjunta">
+    <h3>Foto adjunta - Checklist Diario</h3>
+    {% if pdf_mode %}
+        <img src="file:///{{ (app_root ~ '/static/uploads/' ~ daily_checklist.foto)|replace('\\', '/') }}" alt="Foto adjunta Checklist Diario" class="foto-adjunta">
+    {% else %}
+        <img src="{{ url_for('uploaded_file', filename=daily_checklist.foto) }}" alt="Foto adjunta Checklist Diario" class="foto-adjunta">
+    {% endif %}
+</div>
 {% endif %}
-                ...
-                <img src="file:///{{ app_root }}/static/uploads/{{ tools_check['foto'] }}" alt="Foto adjunta Herramientas y Equipos de Seguridad" class="foto-adjunta">         'item204': 'ESTADO DE RUEDA GUÍA Y SPROCKET',
+{% if tools_check and tools_check.foto %}
+<div class="foto-adjunta">
+    <h3>Foto adjunta - Herramientas y Equipos de Seguridad</h3>
+    {% if pdf_mode %}
+        <img src="file:///{{ (app_root ~ '/static/uploads/' ~ tools_check.foto)|replace('\\', '/') }}" alt="Foto adjunta Herramientas y Equipos de Seguridad" class="foto-adjunta">
+    {% else %}
+        <img src="{{ url_for('uploaded_file', filename=tools_check.foto) }}" alt="Foto adjunta Herramientas y Equipos de Seguridad" class="foto-adjunta">
+    {% endif %}
+</div>
+{% endif %}        'item204': 'ESTADO DE RUEDA GUÍA Y SPROCKET',
                 'item205': 'ESTADO DE CONTROL DE MANDOS ',
                 'item300': 'ESTADO DE ROLA',
                 'item301': 'LAS GOMAS DE LA ROLA',

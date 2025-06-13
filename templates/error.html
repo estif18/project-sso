@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Error</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f9fa; color: #b91c1c; text-align: center; padding: 60px; }
+        .error-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; display: inline-block; padding: 36px 48px; box-shadow: 0 4px 24px rgba(0,0,0,0.07); }
+        h1 { color: #b91c1c; font-size: 2em; margin-bottom: 18px; }
+        p { color: #333; font-size: 1.1em; }
+        a { color: #3182ce; text-decoration: none; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="error-box">
+        <h1>Ocurrió un error</h1>
+        <p>{{ mensaje }}</p>
+        <p><a href="{{ url_for('index') }}">Volver al inicio</a></p>
+    </div>
+</body>
+</html>

@@ -494,8 +494,7 @@ def report(submission_id):
     asset = Asset.query.get(submission.asset_id)
     # Validar existencia de datos críticos
     if not all([company, worker, asset]):
-        flash('Faltan datos para generar el reporte.', 'error')
-        return redirect(url_for('index'))
+        return render_template('error.html', mensaje='Faltan datos para generar el reporte. Verifique que la empresa, trabajador y equipo existan.'), 404
     # Leer checklist y tools_check desde las nuevas tablas relacionales
     daily_checklist = DailyChecklist.query.filter_by(submission_id=submission.id).first()
     tools_check = ToolsCheck.query.filter_by(submission_id=submission.id).first()
@@ -548,8 +547,8 @@ def report(submission_id):
     print(f"[PDF DEBUG] PDFKIT_CONFIG: {PDFKIT_CONFIG}")
     print(f"[PDF DEBUG] Rendered HTML length: {len(rendered)}")
     if not PDFKIT_CONFIG:
-        flash('No se encontró wkhtmltopdf en el servidor. No es posible generar el PDF.', 'error')
-        return redirect(url_for('report', submission_id=submission_id))
+        # Mostrar error en vez de redirigir (evita bucle)
+        return render_template('error.html', mensaje='No se encontró wkhtmltopdf en el servidor. No es posible generar el PDF. Use el botón "Descargar PDF (Navegador)" en la página de reporte.'), 500
     try:
         pdf = pdfkit.from_string(rendered, False, options=options, configuration=PDFKIT_CONFIG)
         print("[PDF DEBUG] PDF generado correctamente")

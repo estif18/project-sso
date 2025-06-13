@@ -430,10 +430,16 @@ var EQUIPO_TYPE_BACKEND = {{ equipo_type_backend|tojson|safe }};
                 });
             } catch(e) {}
         }
-        // Al enviar el formulario, autocompletar con NA
+        // Al enviar el formulario, autocompletar con NA y luego enviar manualmente
         const form = document.querySelector('form');
-        form.addEventListener('submit', function() {
+        form.addEventListener('submit', function(e) {
             autoFillHiddenWithNA();
+            // Forzar el submit después de autocompletar (solo una vez)
+            if (!form.dataset.submitted) {
+                e.preventDefault();
+                form.dataset.submitted = "true";
+                setTimeout(() => form.submit(), 10);
+            }
         });
     });
     </script>

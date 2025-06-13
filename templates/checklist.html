@@ -417,9 +417,10 @@ var EQUIPO_TYPE_BACKEND = {{ equipo_type_backend|tojson|safe }};
 
     // Lógica para autocompletar con NA los campos ocultos antes de enviar
     function autoFillHiddenWithNA() {
-        // Para cada input radio de preguntas ocultas, marcar NA y quitar required
+        // Para cada grupo de radios por pregunta
         document.querySelectorAll('.checklist-table tr').forEach(tr => {
-            if (tr.style.display === 'none' && tr.querySelector('.checklist-label')) {
+            // Si la fila está oculta (por cualquier motivo)
+            if (tr.offsetParent === null || tr.style.display === 'none') {
                 // Buscar input radio NA y marcarlo
                 const naRadio = tr.querySelector('input[type="radio"][value="NA"]');
                 if (naRadio) naRadio.checked = true;
@@ -427,6 +428,12 @@ var EQUIPO_TYPE_BACKEND = {{ equipo_type_backend|tojson|safe }};
                 tr.querySelectorAll('input[type="radio"]').forEach(radio => {
                     radio.required = false;
                 });
+            }
+        });
+        // Además, quitar required de cualquier input radio oculto individualmente
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            if (radio.offsetParent === null || radio.style.display === 'none') {
+                radio.required = false;
             }
         });
     }

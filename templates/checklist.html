@@ -449,8 +449,16 @@ var EQUIPO_TYPE_BACKEND = {{ equipo_type_backend|tojson|safe }};
         // Al enviar el formulario, autocompletar con NA y dejar que el submit siga normal
         const form = document.querySelector('form');
         form.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevenir submit por defecto
             autoFillHiddenWithNA();
-            // No se previene el submit, solo se autocompleta antes de enviar
+            setTimeout(function() {
+                if (form.checkValidity()) {
+                    form.submit();
+                } else {
+                    // Opcional: mostrar mensaje de error si algún campo visible falta
+                    form.reportValidity();
+                }
+            }, 0);
         });
     });
     </script>

@@ -1,33 +1,26 @@
 {% extends 'checklist.html' %}
 {% block body %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Checklist Camioneta</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <div class="header-flex">
-        <div>
-            <h1 style="margin-bottom:0; border-bottom:none; padding-bottom:0;">Checklist Diario - Camioneta</h1>
-        </div>
-        <div class="logo-header">
-            <img src="{{ url_for('static', filename='logo-minera.png') }}" alt="Minera Santa Luisa">
-        </div>
+<div class="header-flex">
+    <div>
+        <h1 style="margin-bottom:0; border-bottom:none; padding-bottom:0;">Checklist Diario - Camioneta</h1>
     </div>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul class="flashes">
-          {% for category, message in messages %}
-            <li class="flash-{{ category }}">{{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
-    <form method="POST" enctype="multipart/form-data">
+    <div class="logo-header">
+        <img src="{{ url_for('static', filename='logo-minera.png') }}" alt="Minera Santa Luisa">
+    </div>
+</div>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <ul class="flashes">
+      {% for category, message in messages %}
+        <li class="flash-{{ category }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+<form method="POST" enctype="multipart/form-data">
     <table class="checklist-table" style="width:100%;max-width:900px;margin:auto;border-collapse:collapse;">
         <tbody>
+            <!-- Bloque: GENERAL (EQUIPO APAGADO) -->
             <tr><th colspan="5" class="checklist-section checklist-section-title">GENERAL (EQUIPO APAGADO)</th></tr>
             <tr>
                 <td class="checklist-label">PROX MANTTO:</td>
@@ -76,6 +69,7 @@
                 </td>
             </tr>
             {% endfor %}
+            <!-- Bloque: GENERAL (MOTOR ENCENDIDO) -->
             <tr><th colspan="5" class="checklist-section checklist-section-title">GENERAL (MOTOR ENCENDIDO)</th></tr>
             {% set items2 = [
                 'VERIFIQUE QUE NO EXISTAN FUGAS DE ACEITE, AGUA, COMBUSTIBLE O LIQUIDO DE FRENO QUE MOJE LOS NEUMÁTICOS*',
@@ -111,7 +105,5 @@
     <div style="text-align:center;margin:24px 0;">
         <button type="submit" style="background: linear-gradient(90deg, #3182ce 0%, #63b3ed 100%); color: #fff; padding: 10px 28px; border-radius: 6px; font-size: 1.1em; font-weight: 600; border:none;">Guardar Checklist</button>
     </div>
-    </form>
-</body>
-</html>
+</form>
 {% endblock %}

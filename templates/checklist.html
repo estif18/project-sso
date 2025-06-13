@@ -308,7 +308,7 @@
     <script>
 // --- Mostrar/ocultar secciones según tipo de equipo ---
 // Obtener el tipo de equipo desde el backend si no hay select
-let EQUIPO_TYPE_BACKEND = "{{ asset.type|escapejs if asset and asset.type else '' }}";
+let EQUIPO_TYPE_BACKEND = "{{ asset.type|e('js') if asset and asset.type else '' }}";
 
 function getEquipoType() {
     // Busca el select en la página anterior (formulario principal)

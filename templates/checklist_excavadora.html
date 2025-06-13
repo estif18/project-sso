@@ -4,18 +4,27 @@
     <meta charset="UTF-8">
     <title>Checklist Excavadora</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .header-flex { display: flex; justify-content: space-between; align-items: center; max-width: 900px; margin: 32px auto 18px auto; }
+        .logo-header img { height: 54px; }
+        .checklist-table { width: 100%; max-width: 900px; margin: auto; border-collapse: collapse; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(44,62,80,0.10); overflow: hidden; }
+        .checklist-label { font-weight: 500; color: #2a4365; }
+        .checklist-btns label { margin-right: 18px; font-weight: 500; }
+        .checklist-btns input[type="radio"] { accent-color: #3182ce; margin-right: 4px; }
+        @media (max-width: 600px) { .header-flex { flex-direction: column; gap: 10px; } .logo-header img { height: 38px; } }
+    </style>
 </head>
 <body>
-    <div class="header-flex">
-        <div><h1>Checklist Diario - Excavadora</h1></div>
-        <div class="logo-header"><img src="{{ url_for('static', filename='logo-minera.png') }}" alt="Minera Santa Luisa"></div>
-    </div>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul class="flashes">{% for category, message in messages %}<li class="flash-{{ category }}">{{ message }}</li>{% endfor %}</ul>
-      {% endif %}
-    {% endwith %}
-    <form method="POST" enctype="multipart/form-data">
+<div class="header-flex">
+    <div><h1 style="margin-bottom:0; border-bottom:none; padding-bottom:0; color:#2a4365;">Checklist Diario - Excavadora</h1></div>
+    <div class="logo-header"><img src="{{ url_for('static', filename='logo-minera.png') }}" alt="Minera Santa Luisa"></div>
+</div>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <ul class="flashes">{% for category, message in messages %}<li class="flash-{{ category }}">{{ message }}</li>{% endfor %}</ul>
+  {% endif %}
+{% endwith %}
+<form method="POST" enctype="multipart/form-data" style="max-width:900px;margin:auto;">
     <table class="checklist-table">
         <tbody>
             <tr><th colspan="5" class="checklist-section checklist-section-title">GENERAL (EQUIPO APAGADO)</th></tr>
@@ -82,8 +91,8 @@
         <input type="file" id="foto" name="foto" accept="image/*" style="margin-bottom:18px;">
     </div>
     <div style="text-align:center;margin:24px 0;">
-        <button type="submit">Guardar Checklist</button>
+        <button type="submit" class="btn-main">Guardar Checklist</button>
     </div>
-    </form>
+</form>
 </body>
 </html>

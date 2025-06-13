@@ -495,10 +495,8 @@ def report(submission_id):
     # Validar existencia de datos críticos
     if not all([company, worker, asset]):
         return render_template('error.html', mensaje='Faltan datos para generar el reporte. Verifique que la empresa, trabajador y equipo existan.'), 404
-    # Leer checklist y tools_check desde las nuevas tablas relacionales
     daily_checklist = DailyChecklist.query.filter_by(submission_id=submission.id).first()
     tools_check = ToolsCheck.query.filter_by(submission_id=submission.id).first()
-    # Obtener cumplimiento por grupo
     group_compliance = GroupCompliance.query.filter_by(submission_id=submission.id).all()
     resumen = 'Cumple'
     grupos_no_cumple = []
@@ -521,7 +519,7 @@ def report(submission_id):
                 resumen = 'No cumple'
                 break
     nc_daily, nc_tools = get_nc_items_with_description(daily_checklist, tools_check)
-    rendered = render_template(
+    return render_template(
         'report.html',
         submission=submission,
         company=company,
@@ -530,7 +528,7 @@ def report(submission_id):
         daily_checklist=daily_checklist,
         tools_check=tools_check,
         created_at=submission.created_at,
-        pdf_mode=True,
+        pdf_mode=False,  # Siempre modo navegador
         app_root=os.path.abspath(os.path.dirname(__file__)),
         group_compliance=group_compliance,
         resumen=resumen,
@@ -539,27 +537,6 @@ def report(submission_id):
         nc_tools=nc_tools,
         diario_no_cumple=diario_no_cumple
     )
-    # Forzar utf-8 en el HTML renderizado para pdfkit
-    if isinstance(rendered, str):
-        rendered = rendered.encode('utf-8').decode('utf-8')
-    options = {'enable-local-file-access': None, 'quiet': ''}
-    print(f"[PDF DEBUG] Entrando a /report/{{submission_id}}/pdf para submission_id={submission_id}")
-    print(f"[PDF DEBUG] PDFKIT_CONFIG: {PDFKIT_CONFIG}")
-    print(f"[PDF DEBUG] Rendered HTML length: {len(rendered)}")
-    if not PDFKIT_CONFIG:
-        # Mostrar error en vez de redirigir (evita bucle)
-        return render_template('error.html', mensaje='No se encontró wkhtmltopdf en el servidor. No es posible generar el PDF. Use el botón "Descargar PDF (Navegador)" en la página de reporte.'), 500
-    try:
-        pdf = pdfkit.from_string(rendered, False, options=options, configuration=PDFKIT_CONFIG)
-        print("[PDF DEBUG] PDF generado correctamente")
-    except Exception as e:
-        print(f"[PDF DEBUG] Error generating PDF: {e}")
-        flash('Error al generar el PDF.', 'error')
-        return redirect(url_for('report', submission_id=submission_id))
-    response = make_response(pdf)
-    response.headers['Content-Type'] = 'application/pdf'
-    response.headers['Content-Disposition'] = f'attachment; filename=Reporte_{submission.id}.pdf'
-    return response
 
 @app.route('/all_reports', methods=['GET', 'POST'])
 def all_reports():
@@ -572,7 +549,7 @@ def all_reports():
     if selected_company:
         submissions_query = submissions_query.filter_by(company_id=selected_company)
     if selected_asset:
-        submissions_query = submissions_query.filter_by(asset_id=selected_asset)
+        submissions_query = submissions_query.filter_by(asset_id=selectedAsset)
     if selected_worker:
         submissions_query = submissions_query.filter_by(worker_id=selected_worker)
     submissions = submissions_query.all()
@@ -823,6 +800,11 @@ def migrar_checklists():
     except IntegrityError as e:
         db.session.rollback()
         print(f"Error de integridad en la migración: {e}")
+
+@app.route('/preview_report')
+def preview_report():
+    # Renderiza la plantilla de vista previa con datos de ejemplo
+    return render_template('preview_report.html')
 
 if __name__ == '__main__':
     try:

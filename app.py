@@ -468,6 +468,10 @@ def report(submission_id):
     company = Company.query.get(submission.company_id)
     worker = Worker.query.get(submission.worker_id)
     asset = Asset.query.get(submission.asset_id)
+    # Validar existencia de datos críticos
+    if not all([company, worker, asset]):
+        flash('Faltan datos para generar el reporte.', 'error')
+        return redirect(url_for('index'))
     # Leer checklist y tools_check desde las nuevas tablas relacionales
     daily_checklist = DailyChecklist.query.filter_by(submission_id=submission.id).first()
     tools_check = ToolsCheck.query.filter_by(submission_id=submission.id).first()
@@ -495,7 +499,22 @@ def report(submission_id):
                 break
     # Obtener ítems no cumplidos con descripción
     nc_daily, nc_tools = get_nc_items_with_description(daily_checklist, tools_check)
-    return render_template('report.html', submission=submission, company=company, worker=worker, asset=asset, daily_checklist=daily_checklist, tools_check=tools_check, created_at=submission.created_at, group_compliance=group_compliance, resumen=resumen, grupos_no_cumple=grupos_no_cumple, nc_daily=nc_daily, nc_tools=nc_tools)
+    # Pasar todos los datos necesarios a la plantilla
+    return render_template(
+        'report.html',
+        submission=submission,
+        company=company,
+        worker=worker,
+        asset=asset,
+        daily_checklist=daily_checklist,
+        tools_check=tools_check,
+        created_at=submission.created_at,
+        group_compliance=group_compliance,
+        resumen=resumen,
+        grupos_no_cumple=grupos_no_cumple,
+        nc_daily=nc_daily,
+        nc_tools=nc_tools
+    )
 
 @app.route('/report/<int:submission_id>/pdf')
 def report_pdf(submission_id):

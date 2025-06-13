@@ -405,22 +405,12 @@ var EQUIPO_TYPE_BACKEND = {{ equipo_type_backend|tojson|safe }};
 
     // Lógica para autocompletar con NA los campos ocultos antes de enviar
     function autoFillHiddenWithNA() {
-        const equipoRaw = getEquipoType();
-        const equipo = normalizeEquipo(equipoRaw);
-        const soloGenerales = equipo === 'camioneta' || equipo === 'ambulancia' || equipo.includes('camioneta') || equipo.includes('ambulancia');
-        if (!soloGenerales) return;
         // Para cada input radio de preguntas ocultas, marcar NA
-        let show = false;
         document.querySelectorAll('.checklist-table tr').forEach(tr => {
-            if (tr.querySelector('.checklist-section-title')) {
-                const t = tr.textContent.trim().toUpperCase();
-                show = t.includes('GENERAL');
-            } else if (tr.querySelector('.checklist-label')) {
-                if (!show) {
-                    // Buscar input radio NA y marcarlo
-                    const naRadio = tr.querySelector('input[type="radio"][value="NA"]');
-                    if (naRadio) naRadio.checked = true;
-                }
+            if (tr.style.display === 'none' && tr.querySelector('.checklist-label')) {
+                // Buscar input radio NA y marcarlo
+                const naRadio = tr.querySelector('input[type="radio"][value="NA"]');
+                if (naRadio) naRadio.checked = true;
             }
         });
     }

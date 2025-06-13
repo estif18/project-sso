@@ -430,9 +430,22 @@ var EQUIPO_TYPE_BACKEND = {{ equipo_type_backend|tojson|safe }};
                 });
             }
         });
-        // Además, quitar required de cualquier input radio oculto individualmente
+        // Además, quitar required de cualquier input radio oculto individualmente o por cualquier contenedor
         document.querySelectorAll('input[type="radio"]').forEach(radio => {
-            if (radio.offsetParent === null || radio.style.display === 'none') {
+            let el = radio;
+            let hidden = false;
+            while (el) {
+                if (el.style && (el.style.display === 'none' || el.style.visibility === 'hidden')) {
+                    hidden = true;
+                    break;
+                }
+                if (el.offsetParent === null && el !== document.body) {
+                    hidden = true;
+                    break;
+                }
+                el = el.parentElement;
+            }
+            if (hidden) {
                 radio.required = false;
             }
         });
@@ -462,7 +475,15 @@ var EQUIPO_TYPE_BACKEND = {{ equipo_type_backend|tojson|safe }};
                 if (form.checkValidity()) {
                     form.submit();
                 } else {
-                    // Opcional: mostrar mensaje de error si algún campo visible falta
+                    // Mostrar mensaje de error si algún campo visible falta
+                    let msg = document.getElementById('form-error-msg');
+                    if (!msg) {
+                        msg = document.createElement('div');
+                        msg.id = 'form-error-msg';
+                        msg.style = 'color:#b91c1c; font-weight:bold; text-align:center; margin-bottom:12px;';
+                        msg.innerText = 'Por favor, responde todas las preguntas obligatorias visibles antes de guardar.';
+                        form.parentNode.insertBefore(msg, form);
+                    }
                     form.reportValidity();
                 }
             }, 0);

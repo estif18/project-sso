@@ -323,44 +323,51 @@ function getEquipoType() {
 
 function updateChecklistVisibility() {
     const equipo = getEquipoType().toLowerCase();
-    // Secciones
-    const secciones = [
-        { key: 'general-apagado', th: 'GENERAL (EQUIPO APAGADO)' },
-        { key: 'general-encendido', th: 'GENERAL (MOTOR ENCENDIDO)' },
-        { key: 'cargador', th: 'CARGADOR FRONTAL, RETROEXCAVADORA, EXCAVADORA, MONTACARGA, MINICARGADOR Y TRACTOR' },
-        { key: 'rodillo', th: 'RODILLO COMPACTADOR' },
-        { key: 'volquete', th: 'VOLQUETE' },
-        { key: 'grua', th: 'GRÚA' },
-        { key: 'cisterna', th: 'CISTERNA Y UTILITARIO' }
-    ];
-    // Solo mostrar generales para camioneta y ambulancia
-    const soloGenerales = equipo.includes('camioneta') || equipo.includes('ambulancia');
+    // Definir los grupos relevantes por tipo de equipo (igual que backend)
+    const gruposPorEquipo = {
+        'camioneta': ['GENERAL (EQUIPO APAGADO)', 'GENERAL (MOTOR ENCENDIDO)'],
+        'ambulancia': ['GENERAL (EQUIPO APAGADO)', 'GENERAL (MOTOR ENCENDIDO)'],
+        'cargador frontal': ['GENERAL (EQUIPO APAGADO)', 'GENERAL (MOTOR ENCENDIDO)', 'CARGADOR FRONTAL, RETROEXCAVADORA, EXCAVADORA, MONTACARGA, MINICARGADOR Y TRACTOR'],
+        'retroexcavadora': ['GENERAL (EQUIPO APAGADO)', 'GENERAL (MOTOR ENCENDIDO)', 'CARGADOR FRONTAL, RETROEXCAVADORA, EXCAVADORA, MONTACARGA, MINICARGADOR Y TRACTOR'],
+        'excavadora': ['GENERAL (EQUIPO APAGADO)', 'GENERAL (MOTOR ENCENDIDO)', 'CARGADOR FRONTAL, RETROEXCAVADORA, EXCAVADORA, MONTACARGA, MINICARGADOR Y TRACTOR'],
+        'montacarga': ['GENERAL (EQUIPO APAGADO)', 'GENERAL (MOTOR ENCENDIDO)', 'CARGADOR FRONTAL, RETROEXCAVADORA, EXCAVADORA, MONTACARGA, MINICARGADOR Y TRACTOR'],
+        'minicargador': ['GENERAL (EQUIPO APAGADO)', 'GENERAL (MOTOR ENCENDIDO)', 'CARGADOR FRONTAL, RETROEXCAVADORA, EXCAVADORA, MONTACARGA, MINICARGADOR Y TRACTOR'],
+        'tractor': ['GENERAL (EQUIPO APAGADO)', 'GENERAL (MOTOR ENCENDIDO)', 'CARGADOR FRONTAL, RETROEXCAVADORA, EXCAVADORA, MONTACARGA, MINICARGADOR Y TRACTOR'],
+        'grúa': ['GENERAL (EQUIPO APAGADO)', 'GENERAL (MOTOR ENCENDIDO)', 'GRÚA'],
+        'cisterna': ['GENERAL (EQUIPO APAGADO)', 'GENERAL (MOTOR ENCENDIDO)', 'CISTERNA Y UTILITARIO'],
+        'utilitario': ['GENERAL (EQUIPO APAGADO)', 'GENERAL (MOTOR ENCENDIDO)', 'CISTERNA Y UTILITARIO'],
+        'volquete': ['GENERAL (EQUIPO APAGADO)', 'GENERAL (MOTOR ENCENDIDO)', 'VOLQUETE']
+    };
+    // Determinar los grupos relevantes para el equipo actual
+    let gruposRelevantes = [];
+    for (const key in gruposPorEquipo) {
+        if (equipo.includes(key)) {
+            gruposRelevantes = gruposPorEquipo[key];
+            break;
+        }
+    }
+    // Mostrar solo los grupos relevantes
     document.querySelectorAll('.checklist-section-title').forEach(th => {
         const text = th.textContent.trim().toUpperCase();
-        if (soloGenerales) {
-            if (text.includes('GENERAL')) {
-                th.parentElement.parentElement.style.display = '';
-            } else {
-                th.parentElement.parentElement.style.display = 'none';
-            }
-        } else {
-            th.parentElement.parentElement.style.display = '';
+        let mostrar = false;
+        for (const g of gruposRelevantes) {
+            if (text === g.toUpperCase()) { mostrar = true; break; }
         }
+        th.parentElement.parentElement.style.display = mostrar ? '' : 'none';
     });
     // Ocultar filas de preguntas de secciones ocultas
-    if (soloGenerales) {
-        let show = false;
-        document.querySelectorAll('.checklist-table tr').forEach(tr => {
-            if (tr.querySelector('.checklist-section-title')) {
-                const t = tr.textContent.trim().toUpperCase();
-                show = t.includes('GENERAL');
-            } else if (tr.querySelector('.checklist-label')) {
-                tr.style.display = show ? '' : 'none';
+    let seccionActual = '';
+    document.querySelectorAll('.checklist-table tr').forEach(tr => {
+        if (tr.querySelector('.checklist-section-title')) {
+            seccionActual = tr.textContent.trim().toUpperCase();
+        } else if (tr.querySelector('.checklist-label')) {
+            let mostrar = false;
+            for (const g of gruposRelevantes) {
+                if (seccionActual === g.toUpperCase()) { mostrar = true; break; }
             }
-        });
-    } else {
-        document.querySelectorAll('.checklist-table tr').forEach(tr => tr.style.display = '');
-    }
+            tr.style.display = mostrar ? '' : 'none';
+        }
+    });
 }
 
 // Lógica para autocompletar con NA los campos ocultos antes de enviar

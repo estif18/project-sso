@@ -437,12 +437,16 @@ var EQUIPO_TYPE_BACKEND = {{ equipo_type_backend|tojson|safe }};
                 el = el.parentElement;
             }
             if (hidden) {
-                // Quitar required
                 radio.required = false;
-                // Si es el radio NA, marcarlo
                 if (radio.value === 'NA') {
                     radio.checked = true;
                 }
+            }
+        });
+        // Refuerzo: quitar required de cualquier input requerido oculto (no solo radios)
+        document.querySelectorAll('input[required]').forEach(input => {
+            if (!input.offsetParent) {
+                input.removeAttribute('required');
             }
         });
     }

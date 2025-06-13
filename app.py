@@ -42,8 +42,24 @@ app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024  # 20MB máximo
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 db = SQLAlchemy(app)
 
-# Configuración explícita de la ruta de wkhtmltopdf para pdfkit en Windows
-PDFKIT_CONFIG = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
+import platform
+
+# Configuración dinámica de la ruta de wkhtmltopdf para pdfkit
+WKHTMLTOPDF_PATH = None
+if platform.system() == 'Windows':
+    win_path = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+    if os.path.exists(win_path):
+        WKHTMLTOPDF_PATH = win_path
+elif platform.system() == 'Linux':
+    linux_path = '/usr/bin/wkhtmltopdf'
+    if os.path.exists(linux_path):
+        WKHTMLTOPDF_PATH = linux_path
+
+if WKHTMLTOPDF_PATH:
+    PDFKIT_CONFIG = pdfkit.configuration(wkhtmltopdf=WKHTMLTOPDF_PATH)
+else:
+    PDFKIT_CONFIG = None
+    print('WARNING: wkhtmltopdf executable not found. PDF generation will not work.')
 
 # Modelos para empresas y trabajadores
 class Company(db.Model):
@@ -559,6 +575,9 @@ def report_pdf(submission_id):
         nc_tools=nc_tools
     )
     options = {'enable-local-file-access': None, 'quiet': ''}
+    if not PDFKIT_CONFIG:
+        flash('No se encontró wkhtmltopdf en el servidor. No es posible generar el PDF.', 'error')
+        return redirect(url_for('report', submission_id=submission_id))
     try:
         pdf = pdfkit.from_string(rendered, False, options=options, configuration=PDFKIT_CONFIG)
     except Exception as e:

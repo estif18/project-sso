@@ -136,6 +136,15 @@
             <img src="{{ url_for('static', filename='logo-minera.png') }}" alt="Minera Santa Luisa">
         </div>
     </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for category, message in messages %}
+            <li class="flash-{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
     <form method="POST" enctype="multipart/form-data">
     <table class="checklist-table" style="width:100%;max-width:900px;margin:auto;border-collapse:collapse;">
         <tbody>
@@ -408,12 +417,16 @@ var EQUIPO_TYPE_BACKEND = {{ equipo_type_backend|tojson|safe }};
 
     // Lógica para autocompletar con NA los campos ocultos antes de enviar
     function autoFillHiddenWithNA() {
-        // Para cada input radio de preguntas ocultas, marcar NA
+        // Para cada input radio de preguntas ocultas, marcar NA y quitar required
         document.querySelectorAll('.checklist-table tr').forEach(tr => {
             if (tr.style.display === 'none' && tr.querySelector('.checklist-label')) {
                 // Buscar input radio NA y marcarlo
                 const naRadio = tr.querySelector('input[type="radio"][value="NA"]');
                 if (naRadio) naRadio.checked = true;
+                // Quitar required de todos los radios de la fila
+                tr.querySelectorAll('input[type="radio"]').forEach(radio => {
+                    radio.required = false;
+                });
             }
         });
     }
@@ -433,20 +446,11 @@ var EQUIPO_TYPE_BACKEND = {{ equipo_type_backend|tojson|safe }};
                 });
             } catch(e) {}
         }
-        // Al enviar el formulario, autocompletar con NA y luego enviar manualmente
+        // Al enviar el formulario, autocompletar con NA y dejar que el submit siga normal
         const form = document.querySelector('form');
         form.addEventListener('submit', function(e) {
             autoFillHiddenWithNA();
-            // Forzar el submit después de autocompletar (solo una vez)
-            if (!form.dataset.submitted) {
-                e.preventDefault();
-                form.dataset.submitted = "true";
-                console.log('[Checklist] Enviando formulario...');
-                setTimeout(() => {
-                    console.log('[Checklist] Ejecutando form.submit()');
-                    form.submit();
-                }, 10);
-            }
+            // No se previene el submit, solo se autocompleta antes de enviar
         });
     });
     </script>

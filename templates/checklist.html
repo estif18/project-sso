@@ -364,9 +364,6 @@ var EQUIPO_TYPE_BACKEND = {{ equipo_type_backend|tojson|safe }};
         let gruposRelevantes = gruposPorEquipo[equipo] || [];
         // Si no hay tipo de equipo, mostrar todo y mensaje visual
         if (!equipo || gruposRelevantes.length === 0) {
-            document.querySelectorAll('.checklist-section-title').forEach(th => {
-                th.parentElement.parentElement.style.display = '';
-            });
             document.querySelectorAll('.checklist-table tr').forEach(tr => {
                 tr.style.display = '';
             });
@@ -387,15 +384,6 @@ var EQUIPO_TYPE_BACKEND = {{ equipo_type_backend|tojson|safe }};
             if (msg) msg.remove();
         }
         // Mostrar solo los grupos relevantes
-        document.querySelectorAll('.checklist-section-title').forEach(th => {
-            const text = th.textContent.trim().toUpperCase();
-            let mostrar = false;
-            for (const g of gruposRelevantes) {
-                if (text === g.toUpperCase()) { mostrar = true; break; }
-            }
-            th.parentElement.parentElement.style.display = mostrar ? '' : 'none';
-        });
-        // Ocultar filas de preguntas de secciones ocultas
         let seccionActual = '';
         let seccionVisible = false;
         document.querySelectorAll('.checklist-table tr').forEach(tr => {
@@ -407,6 +395,9 @@ var EQUIPO_TYPE_BACKEND = {{ equipo_type_backend|tojson|safe }};
                 }
                 tr.style.display = seccionVisible ? '' : 'none';
             } else if (tr.querySelector('.checklist-label')) {
+                tr.style.display = seccionVisible ? '' : 'none';
+            } else {
+                // Otros tr (por ejemplo, fila de fecha), mostrar solo si la sección está visible
                 tr.style.display = seccionVisible ? '' : 'none';
             }
         });

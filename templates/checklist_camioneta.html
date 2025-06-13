@@ -1,0 +1,117 @@
+{% extends 'checklist.html' %}
+{% block body %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Checklist Camioneta</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="header-flex">
+        <div>
+            <h1 style="margin-bottom:0; border-bottom:none; padding-bottom:0;">Checklist Diario - Camioneta</h1>
+        </div>
+        <div class="logo-header">
+            <img src="{{ url_for('static', filename='logo-minera.png') }}" alt="Minera Santa Luisa">
+        </div>
+    </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for category, message in messages %}
+            <li class="flash-{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    <form method="POST" enctype="multipart/form-data">
+    <table class="checklist-table" style="width:100%;max-width:900px;margin:auto;border-collapse:collapse;">
+        <tbody>
+            <tr><th colspan="5" class="checklist-section checklist-section-title">GENERAL (EQUIPO APAGADO)</th></tr>
+            <tr>
+                <td class="checklist-label">PROX MANTTO:</td>
+                <td colspan="4">
+                    <input type="date" name="prox_mantto" required style="width:170px;">
+                </td>
+            </tr>
+            <tr>
+                <td class="checklist-label">CHEQUEO EL STICKER SI LLEGA AL KILOMETRAJE DE MANTTO LLEVE AL TALLER*</td>
+                <td colspan="4">
+                    <div class="checklist-btns">
+                        <label><input type="radio" name="item0" value="C" required> C</label>
+                        <label><input type="radio" name="item0" value="NC"> NC</label>
+                        <label><input type="radio" name="item0" value="NA"> NA</label>
+                    </div>
+                </td>
+            </tr>
+            {% set items1 = [
+                'CHEQUEE SI LA UNIDAD TIENE ALGÚN ROCE, ABOLLADURA, ETC.',
+                'VERIFIQUE QUE NO EXISTAN FUGAS DE ACEITE, AGUA, COMBUSTIBLE*',
+                'PURGAR EL AGUA DEL FILTRO DE PETRÓLEO*',
+                'REVISE EL NIVEL DE ACEITE DE MOTOR*',
+                'REVISE EL NIVEL DE ACEITE HIDRÁULICO',
+                'REVISE EL NIVEL DE LÍQUIDO DE FRENO*',
+                'REVISE EL NIVEL DE LÍQUIDO DE EMBRAGUE*',
+                'REVISE EL NIVEL DE AGUA DEL LIMPIAPARABRISAS',
+                'REVISE CONEXIONES DE BATERÍA Y NIVEL DE ELECTROLITO*',
+                'REVISE TENSIÓN DE LAS FAJAS DE ALTERNADOR*',
+                'VERIFIQUE EL AJUSTE DE TUERCAS DE LAS RUEDAS*',
+                'REVISE ESPEJOS RETROVISORES *',
+                'CINTURÓN DE SEGURIDAD *',
+                'COMPROBAR ALARMA DE RETROCESO *',
+                'COMPROBAR NIVEL DEL REFRIGERANTE',
+                'TAPA DE TANQUE DE COMBUSTIBLE',
+                'VERIFIQUE PROFUNDIDAD DE NEUMÁTICOS ( CAMIONETA Y AMBULANCIA 1.6MM VOLQUETE, SEMITRAYLER Y CAMA BAJA 2.0 MM) **',
+                'COMPUERTAS TRASERAS EN CASO DE FURGÓN *',
+                'CABLE PARA PASAR CORRIENTE DE BATERÍA'
+            ] %}
+            {% for item in items1 %}
+            <tr>
+                <td class="checklist-label">{{ item }}</td>
+                <td class="checklist-btns" colspan="4">
+                    <label><input type="radio" name="item{{ loop.index }}" value="C" required> C</label>
+                    <label><input type="radio" name="item{{ loop.index }}" value="NC"> NC</label>
+                    <label><input type="radio" name="item{{ loop.index }}" value="NA"> NA</label>
+                </td>
+            </tr>
+            {% endfor %}
+            <tr><th colspan="5" class="checklist-section checklist-section-title">GENERAL (MOTOR ENCENDIDO)</th></tr>
+            {% set items2 = [
+                'VERIFIQUE QUE NO EXISTAN FUGAS DE ACEITE, AGUA, COMBUSTIBLE O LIQUIDO DE FRENO QUE MOJE LOS NEUMÁTICOS*',
+                'REVISE LUCES ( BAJA Y ALTA - RUTA ) *',
+                'VERIFIQUE FUNCIONAMIENTO NORMAL DEL TABLERO DE INSTRUMENTOS',
+                'NIVEL DE COMBUSTIBLE MAYOR DE 1/4 DE TANQUE',
+                'COMPROBAR FUNCIONAMIENTO DE CLAXON *',
+                'FRENO DE MANO Y PARQUEO *',
+                'PRESIÓN DE ACEITE DE MOTOR',
+                'CARGA DE ALTERNADOR',
+                'TABLERO DE CONTROL'
+            ] %}
+            {% for item in items2 %}
+            <tr>
+                <td class="checklist-label">{{ item }}</td>
+                <td class="checklist-btns" colspan="4">
+                    <label><input type="radio" name="item{{ 100+loop.index }}" value="C" required> C</label>
+                    <label><input type="radio" name="item{{ 100+loop.index }}" value="NC"> NC</label>
+                    <label><input type="radio" name="item{{ 100+loop.index }}" value="NA"> NA</label>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <!-- Observaciones adicionales y adjuntar foto -->
+    <div style="max-width:900px;margin:24px auto 0 auto;">
+        <label for="observaciones" style="font-weight:bold;">Observaciones adicionales:</label><br>
+        <textarea id="observaciones" name="observaciones" rows="3" style="width:100%;max-width:900px;margin-bottom:12px;"></textarea>
+        <br>
+        <label for="foto" style="font-weight:bold;">Adjuntar foto (opcional):</label><br>
+        <input type="file" id="foto" name="foto" accept="image/*" style="margin-bottom:18px;">
+    </div>
+    <div style="text-align:center;margin:24px 0;">
+        <button type="submit" style="background: linear-gradient(90deg, #3182ce 0%, #63b3ed 100%); color: #fff; padding: 10px 28px; border-radius: 6px; font-size: 1.1em; font-weight: 600; border:none;">Guardar Checklist</button>
+    </div>
+    </form>
+</body>
+</html>
+{% endblock %}

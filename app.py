@@ -448,7 +448,29 @@ def checklist(submission_id):
         db.session.commit()
         flash(f'Checklist guardado correctamente. Estado general: {resumen}', 'success')
         return redirect(url_for('tools_check', submission_id=submission.id))
-    return render_template('checklist.html', submission=submission, company=company, worker=worker, asset=asset)
+    # --- Selección de plantilla según tipo de equipo ---
+    plantilla = 'checklist.html'
+    tipo_equipo_norm = normalize_equipo(asset.type) if asset and asset.type else ''
+    if tipo_equipo_norm == 'camioneta':
+        plantilla = 'checklist_camioneta.html'
+    elif tipo_equipo_norm == 'ambulancia':
+        plantilla = 'checklist_ambulancia.html'
+    elif tipo_equipo_norm == 'volquete':
+        plantilla = 'checklist_volquete.html'
+    elif tipo_equipo_norm == 'grua':
+        plantilla = 'checklist_grua.html'
+    elif tipo_equipo_norm == 'cisterna':
+        plantilla = 'checklist_cisterna.html'
+    elif tipo_equipo_norm == 'utilitario':
+        plantilla = 'checklist_utilitario.html'
+    elif tipo_equipo_norm == 'retroexcavadora':
+        plantilla = 'checklist_retroexcavadora.html'
+    elif tipo_equipo_norm == 'excavadora':
+        plantilla = 'checklist_excavadora.html'
+    elif tipo_equipo_norm == 'cargador frontal':
+        plantilla = 'checklist_cargador_frontal.html'
+    # Puedes agregar más elif para otros tipos de equipo
+    return render_template(plantilla, submission=submission, company=company, worker=worker, asset=asset)
 
 @app.route('/tools_check/<int:submission_id>', methods=['GET', 'POST'])
 def tools_check(submission_id):

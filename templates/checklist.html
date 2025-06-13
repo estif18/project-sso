@@ -307,18 +307,24 @@
     </form>
     <script>
 // --- Mostrar/ocultar secciones según tipo de equipo ---
+// Obtener el tipo de equipo desde el backend si no hay select
+let EQUIPO_TYPE_BACKEND = "{{ asset.type|escapejs if asset and asset.type else '' }}";
+
 function getEquipoType() {
     // Busca el select en la página anterior (formulario principal)
     try {
         // Si el checklist se abre como nueva página, buscar en opener
         if (window.opener) {
             const select = window.opener.document.getElementById('asset_type');
-            return select ? select.value : '';
+            if (select) return select.value;
         }
     } catch(e) {}
     // O buscar en la propia página si el select está presente
     const select = document.getElementById('asset_type');
-    return select ? select.value : '';
+    if (select) return select.value;
+    // Fallback: usar el tipo de equipo del backend
+    if (typeof EQUIPO_TYPE_BACKEND === 'string' && EQUIPO_TYPE_BACKEND.length > 0) return EQUIPO_TYPE_BACKEND;
+    return '';
 }
 
 function normalizeEquipo(str) {

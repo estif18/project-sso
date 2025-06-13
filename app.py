@@ -575,13 +575,17 @@ def report_pdf(submission_id):
         nc_tools=nc_tools
     )
     options = {'enable-local-file-access': None, 'quiet': ''}
+    print(f"[PDF DEBUG] Entrando a /report/{{submission_id}}/pdf para submission_id={submission_id}")
+    print(f"[PDF DEBUG] PDFKIT_CONFIG: {PDFKIT_CONFIG}")
+    print(f"[PDF DEBUG] Rendered HTML length: {len(rendered)}")
     if not PDFKIT_CONFIG:
         flash('No se encontró wkhtmltopdf en el servidor. No es posible generar el PDF.', 'error')
         return redirect(url_for('report', submission_id=submission_id))
     try:
         pdf = pdfkit.from_string(rendered, False, options=options, configuration=PDFKIT_CONFIG)
+        print("[PDF DEBUG] PDF generado correctamente")
     except Exception as e:
-        print(f"Error generating PDF: {e}")
+        print(f"[PDF DEBUG] Error generating PDF: {e}")
         flash('Error al generar el PDF.', 'error')
         return redirect(url_for('report', submission_id=submission_id))
     response = make_response(pdf)

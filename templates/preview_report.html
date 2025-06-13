@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Vista Previa - Reporte Formal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    {% set submission = {'id': 1234} %}
+    {% set company = {'name': 'Minera Santa Luisa S.A.'} %}
+    {% set worker = {'name': 'Juan Pérez'} %}
+    {% set asset = {'type': 'Volquete', 'code': 'VOLQ-001'} %}
+    {% set created_at = namespace(val='13/06/2025 09:30:00') %}
+    {% set daily_checklist = {'item1': 'C', 'item2': 'NC', 'item3': 'C', 'observaciones': 'Fuga leve de aceite detectada.'} %}
+    {% set tools_check = {'herr_item1': 'C', 'herr_item2': 'NC', 'observaciones': 'Falta cinta reflectiva.'} %}
+    {% set group_compliance = [
+        {'group_name': 'CHECKEO DIARIO', 'compliance_status': 'No cumple'},
+        {'group_name': 'Herramientas y Equipos de Seguridad', 'compliance_status': 'No cumple'}
+    ] %}
+    {% set resumen = 'No cumple' %}
+    {% set grupos_no_cumple = ['CHECKEO DIARIO', 'Herramientas y Equipos de Seguridad'] %}
+    {% set nc_daily = ['VERIFIQUE QUE NO EXISTAN FUGAS DE ACEITE, AGUA, COMBUSTIBLE*'] %}
+    {% set nc_tools = ['CINTA REFLECTIVA'] %}
+    {% set diario_no_cumple = True %}
+    {% set pdf_mode = False %}
+    {% set app_root = '' %}
+    {% include 'report.html' %}
+</body>
+</html>

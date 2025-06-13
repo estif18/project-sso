@@ -263,6 +263,13 @@ def checklist(submission_id):
                 flash('Formato de imagen no permitido.', 'error')
         # --- AUTOCOMPLETAR CON NA SEGÚN EL TIPO DE EQUIPO ---
         def normalize_equipo(s):
+            """
+            Normaliza el nombre de equipo para comparación robusta:
+            - Minúsculas
+            - Sin tildes
+            - Sin espacios extra
+            - Sin caracteres especiales
+            """
             if not s:
                 return ''
             s = s.strip().lower()
@@ -270,21 +277,21 @@ def checklist(submission_id):
             s = ''.join(c for c in s if unicodedata.category(c) != 'Mn')
             s = ' '.join(s.split())
             return s
-        tipo_equipo = normalize_equipo(asset.type) if asset and asset.type else ''
-        # Definir los grupos relevantes por tipo de equipo
+
+        # Definir los grupos relevantes por tipo de equipo (todas las claves ya normalizadas)
         grupos_por_equipo = {
-            'camioneta': ['general_apagado', 'general_encendido'],
-            'ambulancia': ['general_apagado', 'general_encendido'],
-            'cargador frontal': ['general_apagado', 'general_encendido', 'cargador'],
-            'retroexcavadora': ['general_apagado', 'general_encendido', 'cargador'],
-            'excavadora': ['general_apagado', 'general_encendido', 'cargador'],
-            'montacarga': ['general_apagado', 'general_encendido', 'cargador'],
-            'minicargador': ['general_apagado', 'general_encendido', 'cargador'],
-            'tractor': ['general_apagado', 'general_encendido', 'cargador'],
-            'grua': ['general_apagado', 'general_encendido', 'grua'],
-            'cisterna': ['general_apagado', 'general_encendido', 'cisterna'],
-            'utilitario': ['general_apagado', 'general_encendido', 'cisterna'],
-            'volquete': ['general_apagado', 'general_encendido', 'volquete'],
+            normalize_equipo('camioneta'): ['general_apagado', 'general_encendido'],
+            normalize_equipo('ambulancia'): ['general_apagado', 'general_encendido'],
+            normalize_equipo('cargador frontal'): ['general_apagado', 'general_encendido', 'cargador'],
+            normalize_equipo('retroexcavadora'): ['general_apagado', 'general_encendido', 'cargador'],
+            normalize_equipo('excavadora'): ['general_apagado', 'general_encendido', 'cargador'],
+            normalize_equipo('montacarga'): ['general_apagado', 'general_encendido', 'cargador'],
+            normalize_equipo('minicargador'): ['general_apagado', 'general_encendido', 'cargador'],
+            normalize_equipo('tractor'): ['general_apagado', 'general_encendido', 'cargador'],
+            normalize_equipo('grua'): ['general_apagado', 'general_encendido', 'grua'],
+            normalize_equipo('cisterna'): ['general_apagado', 'general_encendido', 'cisterna'],
+            normalize_equipo('utilitario'): ['general_apagado', 'general_encendido', 'cisterna'],
+            normalize_equipo('volquete'): ['general_apagado', 'general_encendido', 'volquete'],
         }
         # Mapear los grupos a los campos del checklist
         grupos_items = {
@@ -297,12 +304,9 @@ def checklist(submission_id):
             'cisterna': [f'item{600+i}' for i in range(1,3)]
         }
         # Determinar los grupos relevantes para el equipo actual
-        grupos_relevantes = []
-        for key, grupos in grupos_por_equipo.items():
-            key_norm = normalize_equipo(key)
-            if tipo_equipo == key_norm or key_norm in tipo_equipo or tipo_equipo in key_norm:
-                grupos_relevantes = grupos
-                break
+        tipo_equipo = normalize_equipo(asset.type) if asset and asset.type else ''
+        # Busca coincidencia exacta
+        grupos_relevantes = grupos_por_equipo.get(tipo_equipo, [])
         # Si hay grupos relevantes, autocompletar el resto con NA
         if grupos_relevantes:
             # Todos los posibles campos del checklist diario
@@ -850,7 +854,7 @@ if __name__ == '__main__':
         test_mysql_connector()
         with app.app_context():
             db.create_all()
-        app.run(debug=True)
+        app.run(debug=True, port=8080)
     except Exception as e:
         import traceback
         print('--- APP STARTUP ERROR ---')

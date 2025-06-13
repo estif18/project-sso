@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory, make_response
 from flask_sqlalchemy import SQLAlchemy
 import json # Added
-import pdfkit # Added
 from datetime import datetime
 import pytz # Added
 import os # Added
@@ -43,23 +42,6 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 db = SQLAlchemy(app)
 
 import platform
-
-# Configuración dinámica de la ruta de wkhtmltopdf para pdfkit
-WKHTMLTOPDF_PATH = None
-if platform.system() == 'Windows':
-    win_path = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
-    if os.path.exists(win_path):
-        WKHTMLTOPDF_PATH = win_path
-elif platform.system() == 'Linux':
-    linux_path = '/usr/bin/wkhtmltopdf'
-    if os.path.exists(linux_path):
-        WKHTMLTOPDF_PATH = linux_path
-
-if WKHTMLTOPDF_PATH:
-    PDFKIT_CONFIG = pdfkit.configuration(wkhtmltopdf=WKHTMLTOPDF_PATH)
-else:
-    PDFKIT_CONFIG = None
-    print('WARNING: wkhtmltopdf executable not found. PDF generation will not work.')
 
 # Modelos para empresas y trabajadores
 class Company(db.Model):

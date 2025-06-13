@@ -503,59 +503,24 @@ def report(submission_id):
     group_compliance = GroupCompliance.query.filter_by(submission_id=submission.id).all()
     resumen = 'Cumple'
     grupos_no_cumple = []
+    diario_no_cumple = False
     for gc in group_compliance:
         if gc.compliance_status == 'No cumple':
             resumen = 'No cumple'
             grupos_no_cumple.append(gc.group_name)
-    # Si el checklist diario tiene algún NC, el resumen debe ser 'No cumple'
     if daily_checklist:
         daily_dict = daily_checklist.to_dict()
         for k, v in daily_dict.items():
             if k.startswith('item') and v == 'NC':
                 resumen = 'No cumple'
+                diario_no_cumple = True
                 break
-    # Si el tools_check tiene algún NC, el resumen debe ser 'No cumple'
     if tools_check:
         tools_dict = tools_check.to_dict()
         for k, v in tools_dict.items():
             if (k.startswith('herr_item') or k.startswith('kit_') or k.startswith('otros_')) and v == 'NC':
                 resumen = 'No cumple'
                 break
-    # Obtener ítems no cumplidos con descripción
-    nc_daily, nc_tools = get_nc_items_with_description(daily_checklist, tools_check)
-    # Pasar todos los datos necesarios a la plantilla
-    return render_template(
-        'report.html',
-        submission=submission,
-        company=company,
-        worker=worker,
-        asset=asset,
-        daily_checklist=daily_checklist,
-        tools_check=tools_check,
-        created_at=submission.created_at,
-        group_compliance=group_compliance,
-        resumen=resumen,
-        grupos_no_cumple=grupos_no_cumple,
-        nc_daily=nc_daily,
-        nc_tools=nc_tools
-    )
-
-@app.route('/report/<int:submission_id>/pdf')
-def report_pdf(submission_id):
-    submission = Submission.query.get_or_404(submission_id)
-    company = Company.query.get(submission.company_id)
-    worker = Worker.query.get(submission.worker_id)
-    asset = Asset.query.get(submission.asset_id)
-    daily_checklist = DailyChecklist.query.filter_by(submission_id=submission.id).first()
-    tools_check = ToolsCheck.query.filter_by(submission_id=submission.id).first()
-    # Obtener cumplimiento por grupo
-    group_compliance = GroupCompliance.query.filter_by(submission_id=submission.id).all()
-    resumen = 'Cumple'
-    grupos_no_cumple = []
-    for gc in group_compliance:
-        if gc.compliance_status == 'No cumple':
-            resumen = 'No cumple'
-            grupos_no_cumple.append(gc.group_name)
     nc_daily, nc_tools = get_nc_items_with_description(daily_checklist, tools_check)
     rendered = render_template(
         'report.html',
@@ -572,7 +537,8 @@ def report_pdf(submission_id):
         resumen=resumen,
         grupos_no_cumple=grupos_no_cumple,
         nc_daily=nc_daily,
-        nc_tools=nc_tools
+        nc_tools=nc_tools,
+        diario_no_cumple=diario_no_cumple
     )
     # Forzar utf-8 en el HTML renderizado para pdfkit
     if isinstance(rendered, str):

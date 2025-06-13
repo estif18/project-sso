@@ -260,25 +260,42 @@ def checklist(submission_id):
     # --- Selección de plantilla según tipo de equipo ---
     plantilla = 'checklist.html'
     tipo_equipo_norm = normalize_equipo(asset.type) if asset and asset.type else ''
+    plantilla_asignada = False
     if tipo_equipo_norm == 'camioneta':
         plantilla = 'checklist_camioneta.html'
+        plantilla_asignada = True
     elif tipo_equipo_norm == 'ambulancia':
         plantilla = 'checklist_ambulancia.html'
+        plantilla_asignada = True
     elif tipo_equipo_norm == 'volquete':
         plantilla = 'checklist_volquete.html'
+        plantilla_asignada = True
     elif tipo_equipo_norm == 'grua':
         plantilla = 'checklist_grua.html'
+        plantilla_asignada = True
     elif tipo_equipo_norm == 'cisterna':
         plantilla = 'checklist_cisterna.html'
+        plantilla_asignada = True
     elif tipo_equipo_norm == 'utilitario':
         plantilla = 'checklist_utilitario.html'
+        plantilla_asignada = True
     elif tipo_equipo_norm == 'retroexcavadora':
         plantilla = 'checklist_retroexcavadora.html'
+        plantilla_asignada = True
     elif tipo_equipo_norm == 'excavadora':
         plantilla = 'checklist_excavadora.html'
+        plantilla_asignada = True
     elif tipo_equipo_norm == 'cargador frontal':
         plantilla = 'checklist_cargador_frontal.html'
+        plantilla_asignada = True
     # Puedes agregar más elif para otros tipos de equipo
+    # --- Mensaje de depuración y flash informativo ---
+    if plantilla_asignada:
+        flash(f"Plantilla seleccionada: {plantilla} para tipo de equipo '{asset.type}' (normalizado: '{tipo_equipo_norm}')", 'info')
+        print(f"[INFO] Plantilla seleccionada: {plantilla} para tipo de equipo '{asset.type}' (normalizado: '{tipo_equipo_norm}')")
+    else:
+        flash(f"Advertencia: El tipo de equipo '{asset.type}' no tiene checklist específico. Se usará el general.", 'warning')
+        print(f"[DEBUG] Tipo de equipo no reconocido para plantilla específica: '{asset.type}' (normalizado: '{tipo_equipo_norm}')")
 
     grupos_por_equipo = {
         normalize_equipo('camioneta'): ['general_apagado', 'general_encendido'],
@@ -693,7 +710,7 @@ def all_reports():
     if selected_company:
         submissions_query = submissions_query.filter_by(company_id=selected_company)
     if selected_asset:
-        submissions_query = submissions_query.filter_by(asset_id=selectedAsset)
+        submissions_query = submissions_query.filter_by(asset_id=selected_asset)
     if selected_worker:
         submissions_query = submissions_query.filter_by(worker_id=selected_worker)
     submissions = submissions_query.all()

@@ -312,14 +312,24 @@ var EQUIPO_TYPE_BACKEND = {{ equipo_type_backend|tojson|safe }};
         try {
             if (window.opener) {
                 const select = window.opener.document.getElementById('asset_type');
-                if (select) return select.value;
+                if (select) {
+                    console.log('[Checklist] Tipo de equipo obtenido de opener:', select.value);
+                    return select.value;
+                }
             }
-        } catch(e) {}
+        } catch(e) { console.warn('[Checklist] No se pudo acceder a opener:', e); }
         // O buscar en la propia página si el select está presente
         const select = document.getElementById('asset_type');
-        if (select) return select.value;
+        if (select) {
+            console.log('[Checklist] Tipo de equipo obtenido del select local:', select.value);
+            return select.value;
+        }
         // Fallback: usar el tipo de equipo del backend
-        if (typeof EQUIPO_TYPE_BACKEND === 'string' && EQUIPO_TYPE_BACKEND.length > 0) return EQUIPO_TYPE_BACKEND;
+        if (typeof EQUIPO_TYPE_BACKEND === 'string' && EQUIPO_TYPE_BACKEND.length > 0) {
+            console.log('[Checklist] Tipo de equipo obtenido del backend:', EQUIPO_TYPE_BACKEND);
+            return EQUIPO_TYPE_BACKEND;
+        }
+        console.log('[Checklist] No se detectó tipo de equipo, se mostrará todo');
         return '';
     }
 
@@ -335,6 +345,7 @@ var EQUIPO_TYPE_BACKEND = {{ equipo_type_backend|tojson|safe }};
     function updateChecklistVisibility() {
         const equipoRaw = getEquipoType();
         const equipo = normalizeEquipo(equipoRaw);
+        console.log('[Checklist] Tipo de equipo normalizado:', equipo);
         // Definir los grupos relevantes por tipo de equipo (igual que backend)
         const gruposPorEquipo = {
             'camioneta': ['GENERAL (EQUIPO APAGADO)', 'GENERAL (MOTOR ENCENDIDO)'],
@@ -350,9 +361,8 @@ var EQUIPO_TYPE_BACKEND = {{ equipo_type_backend|tojson|safe }};
             'utilitario': ['GENERAL (EQUIPO APAGADO)', 'GENERAL (MOTOR ENCENDIDO)', 'CISTERNA Y UTILITARIO'],
             'volquete': ['GENERAL (EQUIPO APAGADO)', 'GENERAL (MOTOR ENCENDIDO)', 'VOLQUETE']
         };
-        // Determinar los grupos relevantes para el equipo actual (solo igualdad exacta)
         let gruposRelevantes = gruposPorEquipo[equipo] || [];
-        // Si no hay tipo de equipo, mostrar todo
+        // Si no hay tipo de equipo, mostrar todo y mensaje visual
         if (!equipo || gruposRelevantes.length === 0) {
             document.querySelectorAll('.checklist-section-title').forEach(th => {
                 th.parentElement.parentElement.style.display = '';
@@ -360,7 +370,21 @@ var EQUIPO_TYPE_BACKEND = {{ equipo_type_backend|tojson|safe }};
             document.querySelectorAll('.checklist-table tr').forEach(tr => {
                 tr.style.display = '';
             });
+            // Mostrar mensaje visual si no hay tipo de equipo
+            let msg = document.getElementById('tipo-equipo-msg');
+            if (!msg) {
+                msg = document.createElement('div');
+                msg.id = 'tipo-equipo-msg';
+                msg.style = 'color:#b91c1c; font-weight:bold; text-align:center; margin-bottom:12px;';
+                msg.innerText = 'No se detectó tipo de equipo. Se muestran todas las preguntas.';
+                const form = document.querySelector('form');
+                form.parentNode.insertBefore(msg, form);
+            }
             return;
+        } else {
+            // Quitar mensaje si existe
+            let msg = document.getElementById('tipo-equipo-msg');
+            if (msg) msg.remove();
         }
         // Mostrar solo los grupos relevantes
         document.querySelectorAll('.checklist-section-title').forEach(th => {
@@ -373,15 +397,17 @@ var EQUIPO_TYPE_BACKEND = {{ equipo_type_backend|tojson|safe }};
         });
         // Ocultar filas de preguntas de secciones ocultas
         let seccionActual = '';
+        let seccionVisible = false;
         document.querySelectorAll('.checklist-table tr').forEach(tr => {
             if (tr.querySelector('.checklist-section-title')) {
                 seccionActual = tr.textContent.trim().toUpperCase();
-            } else if (tr.querySelector('.checklist-label')) {
-                let mostrar = false;
+                seccionVisible = false;
                 for (const g of gruposRelevantes) {
-                    if (seccionActual === g.toUpperCase()) { mostrar = true; break; }
+                    if (seccionActual === g.toUpperCase()) { seccionVisible = true; break; }
                 }
-                tr.style.display = mostrar ? '' : 'none';
+                tr.style.display = seccionVisible ? '' : 'none';
+            } else if (tr.querySelector('.checklist-label')) {
+                tr.style.display = seccionVisible ? '' : 'none';
             }
         });
     }

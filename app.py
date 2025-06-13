@@ -178,16 +178,21 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def calcular_cumplimiento_grupo(respuestas, items):
-    if not items:
+    valores = [respuestas.get(item) for item in items]
+    # Filtra los que no tienen respuesta (None o '')
+    valores_validos = [v for v in valores if v not in (None, '', 'None')]
+    if not valores_validos:
         return 'No aplica'
-    valores = [respuestas.get(item) for item in items if item in respuestas]
-    if not valores:
+    if all(v == 'NA' for v in valores_validos):
         return 'No aplica'
-    if all(v == 'NA' for v in valores):
-        return 'No aplica'
-    if any(v == 'NC' for v in valores):
+    if any(v == 'NC' for v in valores_validos):
         return 'No cumple'
-    return 'Cumple'
+    if all(v == 'C' for v in valores_validos):
+        return 'Cumple'
+    # Si hay mezcla de 'C' y 'NA', pero ningún 'NC'
+    if all(v in ('C', 'NA') for v in valores_validos):
+        return 'Cumple'
+    return 'No aplica'
 
 @app.route('/get_workers', methods=['POST'])
 def get_workers():

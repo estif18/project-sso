@@ -116,28 +116,30 @@
     <div class="pdf-container">
         <div class="header-flex">
             <div>
-                <h1 style="margin-bottom:0; border-bottom:none; padding-bottom:0;">Reporte de Checklist</h1>
+                <h1 style="margin-bottom:0; border-bottom:none; padding-bottom:0; font-size:2.1em; letter-spacing:1px;">REPORTE TÉCNICO DE INSPECCIÓN DE EQUIPO</h1>
+                <h2 style="margin:0; font-size:1.1em; color:#555; font-weight:400;">Formato de Cumplimiento de Checklist Diario y Equipos de Seguridad</h2>
             </div>
             <div class="logo-header">
                 <img src="{{ url_for('static', filename='logo-minera.png') }}" alt="Minera Santa Luisa">
             </div>
         </div>
-        <h2>Datos del Registro</h2>
-        <table>
-            <tr><th>ID</th><td>{{ submission.id }}</td></tr>
+        <hr style="border:1.5px solid #3182ce; margin:18px 0 24px 0;">
+        <h2 style="font-size:1.15em; color:#1a202c; margin-bottom:8px;">1. Datos Generales del Registro</h2>
+        <table style="margin-bottom:18px;">
+            <tr><th>ID de Registro</th><td>{{ submission.id }}</td></tr>
             <tr><th>Empresa</th><td>{{ company.name }}</td></tr>
-            <tr><th>Trabajador</th><td>{{ worker.name }}</td></tr>
-            <tr><th>Equipo</th><td>{{ asset.type }}</td></tr>
+            <tr><th>Trabajador Responsable</th><td>{{ worker.name }}</td></tr>
+            <tr><th>Equipo Inspeccionado</th><td>{{ asset.type }}</td></tr>
             <tr><th>Placa/Código</th><td>{{ asset.code }}</td></tr>
-            <tr><th>Fecha y hora de registro</th><td>{{ created_at.strftime('%d/%m/%Y %H:%M:%S') }} (GMT-5 Perú)</td></tr>
+            <tr><th>Fecha y Hora de Inspección</th><td>{{ created_at.strftime('%d/%m/%Y %H:%M:%S') }} (GMT-5 Perú)</td></tr>
         </table>
         {% set checklist = daily_checklist.to_dict() if daily_checklist else {} %}
         {% set tools_check = tools_check.to_dict() if tools_check else {} %}
         {% if checklist %}
-        <h3 class="section-title">Checklist Diario</h3>
+        <h3 class="section-title" style="margin-top:24px;">2. Checklist Diario de Operación</h3>
         <table>
             <thead>
-                <tr><th>Descripción</th><th style="text-align:center;">Respuesta</th></tr>
+                <tr><th style="width:70%;">Descripción del Ítem</th><th style="text-align:center;">Respuesta</th></tr>
             </thead>
             <tbody>
             {% set checklist_desc = {
@@ -206,10 +208,10 @@
         </table>
         {% endif %}
         {% if tools_check %}
-        <h3 class="section-title">Herramientas y Equipos de Seguridad</h3>
+        <h3 class="section-title" style="margin-top:24px;">3. Herramientas y Equipos de Seguridad</h3>
         <table>
             <thead>
-                <tr><th>Ítem</th><th style="text-align:center;">Respuesta</th></tr>
+                <tr><th style="width:70%;">Ítem</th><th style="text-align:center;">Respuesta</th></tr>
             </thead>
             <tbody>
             {% set tools_desc = {
@@ -250,19 +252,19 @@
         {% endif %}
         {% if checklist and checklist.get('observaciones') %}
         <div class="observaciones">
-            <h3>Observaciones adicionales</h3>
+            <h3>4. Observaciones adicionales</h3>
             <p>{{ checklist['observaciones'] }}</p>
         </div>
         {% endif %}
         {% if tools_check and tools_check.get('observaciones') %}
         <div class="observaciones">
-            <h3>Observaciones adicionales - Herramientas y Equipos de Seguridad</h3>
+            <h3>5. Observaciones adicionales - Herramientas y Equipos de Seguridad</h3>
             <p>{{ tools_check['observaciones'] }}</p>
         </div>
         {% endif %}
         {% if checklist and checklist.get('foto') %}
         <div class="foto-adjunta">
-            <h3>Foto adjunta - Checklist Diario</h3>
+            <h3>6. Foto adjunta - Checklist Diario</h3>
             {% if pdf_mode %}
                 <img src="file:///{{ (app_root ~ '/static/uploads/' ~ checklist['foto'])|replace('\\', '/') }}" alt="Foto adjunta Checklist Diario" class="foto-adjunta">
             {% else %}
@@ -272,7 +274,7 @@
         {% endif %}
         {% if tools_check and tools_check.get('foto') %}
         <div class="foto-adjunta">
-            <h3>Foto adjunta - Herramientas y Equipos de Seguridad</h3>
+            <h3>7. Foto adjunta - Herramientas y Equipos de Seguridad</h3>
             {% if pdf_mode %}
                 <img src="file:///{{ (app_root ~ '/static/uploads/' ~ tools_check['foto'])|replace('\\', '/') }}" alt="Foto adjunta Herramientas y Equipos de Seguridad" class="foto-adjunta">
             {% else %}
@@ -281,7 +283,7 @@
         </div>
         {% endif %}
         {% if nc_daily or nc_tools %}
-        <h3 style="color:#b91c1c;">Ítems No Cumplidos</h3>
+        <h3 style="color:#b91c1c; margin-top:24px;">8. Ítems No Cumplidos</h3>
         {% if nc_daily %}
         <h4 style="margin-bottom:6px;">Checklist Diario</h4>
         <ul>
@@ -299,7 +301,7 @@
         </ul>
         {% endif %}
         {% endif %}
-        <h3>Resumen de Cumplimiento</h3>
+        <h3 style="margin-top:24px;">9. Resumen de Cumplimiento por Grupo</h3>
         <table>
             <thead>
                 <tr><th>Grupo</th><th style="text-align:center;">Cumplimiento</th></tr>
@@ -328,9 +330,9 @@
             <a href="{{ url_for('report_pdf', submission_id=submission.id) }}" style="background: linear-gradient(90deg, #38a169 0%, #68d391 100%); color: #fff; padding: 8px 18px; border-radius: 6px; text-decoration: none; font-weight: 600; margin-left: 10px;">Descargar PDF</a>
         </div>
         {% endif %}
-        <div class="footer">
-            Reporte generado el {{ created_at.strftime('%d/%m/%Y %H:%M:%S') }}<br>
-            Sistema de Gestión de Empresas
+        <div class="footer" style="margin-top:32px;">
+            <b>Reporte generado el {{ created_at.strftime('%d/%m/%Y %H:%M:%S') }}</b><br>
+            <span style="font-size:13px;">Sistema de Gestión de Empresas - Área de Seguridad y Salud Ocupacional</span>
         </div>
     </div>
 </body>

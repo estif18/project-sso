@@ -574,6 +574,9 @@ def report_pdf(submission_id):
         nc_daily=nc_daily,
         nc_tools=nc_tools
     )
+    # Forzar utf-8 en el HTML renderizado para pdfkit
+    if isinstance(rendered, str):
+        rendered = rendered.encode('utf-8').decode('utf-8')
     options = {'enable-local-file-access': None, 'quiet': ''}
     print(f"[PDF DEBUG] Entrando a /report/{{submission_id}}/pdf para submission_id={submission_id}")
     print(f"[PDF DEBUG] PDFKIT_CONFIG: {PDFKIT_CONFIG}")

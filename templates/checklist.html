@@ -305,7 +305,7 @@
     </form>
     {% set equipo_type_backend = asset.type if asset is defined and asset and asset.type is defined and asset.type else '' %}
     <script>
-var EQUIPO_TYPE_BACKEND = "{{ equipo_type_backend|e('js') }}";
+var EQUIPO_TYPE_BACKEND = {{ equipo_type_backend|tojson|safe }};
 // --- Mostrar/ocultar secciones según tipo de equipo ---
     function getEquipoType() {
         // Busca el select en la página anterior (formulario principal)

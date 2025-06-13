@@ -248,6 +248,32 @@ def checklist(submission_id):
     asset = Asset.query.get(submission.asset_id)
     if request.method == 'POST':
         checklist = dict(request.form)
+        # DEBUG: Mostrar en consola los datos recibidos
+        print('--- CHECKLIST SUBMIT DEBUG ---')
+        print('Checklist recibido:', checklist)
+        print('Campos requeridos:')
+        for i in range(0, 20):
+            print(f'item{i}:', checklist.get(f'item{i}'))
+        for i in range(1, 10):
+            print(f'item{100+i}:', checklist.get(f'item{100+i}'))
+        for i in range(1, 7):
+            print(f'item{200+i}:', checklist.get(f'item{200+i}'))
+        for i in range(1, 3):
+            print(f'item{300+i}:', checklist.get(f'item{300+i}'))
+        for i in range(1, 7):
+            print(f'item{400+i}:', checklist.get(f'item{400+i}'))
+        for i in range(1, 3):
+            print(f'item{500+i}:', checklist.get(f'item{500+i}'))
+        for i in range(1, 3):
+            print(f'item{600+i}:', checklist.get(f'item{600+i}'))
+        # Validar que todos los campos requeridos estén presentes (ejemplo para los primeros 20)
+        missing = []
+        for i in range(0, 20):
+            if f'item{i}' not in checklist or checklist.get(f'item{i}') in (None, '', 'None'):
+                missing.append(f'item{i}')
+        if missing:
+            flash(f'Faltan respuestas en: {", ".join(missing)}. Revisa el autocompletado de NA.', 'error')
+            print('FALTAN CAMPOS:', missing)
         # Guardar observaciones
         observaciones = request.form.get('observaciones', '')
         # Guardar foto si se adjunta
@@ -592,7 +618,7 @@ def all_reports():
     if selected_company:
         submissions_query = submissions_query.filter_by(company_id=selected_company)
     if selected_asset:
-        submissions_query = submissions_query.filter_by(asset_id=selected_asset)
+        submissions_query = submissions_query.filter_by(asset_id=selectedAsset)
     if selected_worker:
         submissions_query = submissions_query.filter_by(worker_id=selected_worker)
     submissions = submissions_query.all()

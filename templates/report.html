@@ -141,81 +141,67 @@
             </thead>
             <tbody>
             {% set checklist_desc = {
-                'item0': 'CHEQUEO EL STICKER SI LLEGA AL KILOMETRAJE DE MANTTO LLEVE AL TALLER',
-                'prox_mantto': 'PROX MANTTO',
-                'item1': 'CHEQUEE SI LA UNIDAD TIENE ALGÚN ROCE, ABOLLADURA, ETC.',
-                'item2': 'VERIFIQUE QUE NO EXISTAN FUGAS DE ACEITE, AGUA, COMBUSTIBLE*',
-                'item3': 'PURGAR EL AGUA DEL FILTRO DE PETRÓLEO*',
-                'item4': 'REVISE EL NIVEL DE ACEITE DE MOTOR*',
-                'item5': 'REVISE EL NIVEL DE ACEITE HIDRÁULICO',
-                'item6': 'REVISE EL NIVEL DE LÍQUIDO DE FRENO*',
-                'item7': 'REVISE EL NIVEL DE LÍQUIDO DE EMBRAGUE*',
-                'item8': 'REVISE EL NIVEL DE AGUA DEL LIMPIAPARABRISAS',
-                'item9': 'REVISE CONEXIONES DE BATERÍA Y NIVEL DE ELECTROLITO*',
-                'item10': 'REVISE TENSIÓN DE LAS FAJAS DE ALTERNADOR*',
-                'item11': 'VERIFIQUE EL AJUSTE DE TUERCAS DE LAS RUEDAS*',
-                'item12': 'REVISE ESPEJOS RETROVISORES *',
-                'item13': 'CINTURÓN DE SEGURIDAD *',
-                'item14': 'COMPROBAR ALARMA DE RETROCESO *',
-                'item15': 'COMPROBAR NIVEL DEL REFRIGERANTE',
-                'item16': 'TAPA DE TANQUE DE COMBUSTIBLE',
-                'item17': 'VERIFIQUE PROFUNDIDAD DE NEUMÁTICOS',
-                'item18': 'COMPUERTAS TRASERAS EN CASO DE FURGÓN *',
-                'item19': 'CABLE PARA PASAR CORRIENTE DE BATERÍA',
-                'item100': 'VERIFIQUE QUE NO EXISTAN FUGAS DE ACEITE, AGUA, COMBUSTIBLE O LIQUIDO DE FRENO QUE MOJE LOS NEUMÁTICOS*',
-                'item101': 'REVISE LUCES ( BAJA Y ALTA - RUTA ) *',
-                'item102': 'VERIFIQUE FUNCIONAMIENTO NORMAL DEL TABLERO DE INSTRUMENTOS',
-                'item103': 'NIVEL DE COMBUSTIBLE MAYOR DE 1/4 DE TANQUE',
-                'item104': 'COMPROBAR FUNCIONAMIENTO DE CLAXON *',
-                'item105': 'FRENO DE MANO Y PARQUEO *',
-                'item106': 'PRESIÓN DE ACEITE DE MOTOR',
-                'item107': 'CARGA DE ALTERNADOR',
-                'item108': 'TABLERO DE CONTROL',
-                'item200': 'NIVEL DE ACEITE DE TRANSMISIÓN Y HIDRÁULICO',
-                'item201': 'UÑAS Y CADENA DE LEVANTE',
-                'item202': 'BRAZO DE SOPORTE',
-                'item2{% if daily_checklist and daily_checklist.foto %}
-<div class="foto-adjunta">
-    <h3>Foto adjunta - Checklist Diario</h3>
-    {% if pdf_mode %}
-       <img src="file:///{{ app_root }}/static/uploads/{{ daily_checklist.foto }}" alt="Foto adjunta Checklist Diario" class="foto-adjunta">
-    {% else %}
-        <img src="/uploads/{{ daily_checklist.foto }}" ...>
+    'item0': 'CHEQUEO EL STICKER SI LLEGA AL KILOMETRAJE DE MANTTO LLEVE AL TALLER',
+    'prox_mantto': 'PROX MANTTO',
+    'item1': 'CHEQUEE SI LA UNIDAD TIENE ALGÚN ROCE, ABOLLADURA, ETC.',
+    'item2': 'VERIFIQUE QUE NO EXISTAN FUGAS DE ACEITE, AGUA, COMBUSTIBLE*',
+    'item3': 'PURGAR EL AGUA DEL FILTRO DE PETRÓLEO*',
+    'item4': 'REVISE EL NIVEL DE ACEITE DE MOTOR*',
+    'item5': 'REVISE EL NIVEL DE ACEITE HIDRÁULICO',
+    'item6': 'REVISE EL NIVEL DE LÍQUIDO DE FRENO*',
+    'item7': 'REVISE EL NIVEL DE LÍQUIDO DE EMBRAGUE*',
+    'item8': 'REVISE EL NIVEL DE AGUA DEL LIMPIAPARABRISAS',
+    'item9': 'REVISE CONEXIONES DE BATERÍA Y NIVEL DE ELECTROLITO*',
+    'item10': 'REVISE TENSIÓN DE LAS FAJAS DE ALTERNADOR*',
+    'item11': 'VERIFIQUE EL AJUSTE DE TUERCAS DE LAS RUEDAS*',
+    'item12': 'REVISE ESPEJOS RETROVISORES *',
+    'item13': 'CINTURÓN DE SEGURIDAD *',
+    'item14': 'COMPROBAR ALARMA DE RETROCESO *',
+    'item15': 'COMPROBAR NIVEL DEL REFRIGERANTE',
+    'item16': 'TAPA DE TANQUE DE COMBUSTIBLE',
+    'item17': 'VERIFIQUE PROFUNDIDAD DE NEUMÁTICOS',
+    'item18': 'COMPUERTAS TRASERAS EN CASO DE FURGÓN *',
+    'item19': 'CABLE PARA PASAR CORRIENTE DE BATERÍA',
+    'item100': 'VERIFIQUE QUE NO EXISTAN FUGAS DE ACEITE, AGUA, COMBUSTIBLE O LIQUIDO DE FRENO QUE MOJE LOS NEUMÁTICOS*',
+    'item101': 'REVISE LUCES ( BAJA Y ALTA - RUTA ) *',
+    'item102': 'VERIFIQUE FUNCIONAMIENTO NORMAL DEL TABLERO DE INSTRUMENTOS',
+    'item103': 'NIVEL DE COMBUSTIBLE MAYOR DE 1/4 DE TANQUE',
+    'item104': 'COMPROBAR FUNCIONAMIENTO DE CLAXON *',
+    'item105': 'FRENO DE MANO Y PARQUEO *',
+    'item106': 'PRESIÓN DE ACEITE DE MOTOR',
+    'item107': 'CARGA DE ALTERNADOR',
+    'item108': 'TABLERO DE CONTROL',
+    'item200': 'NIVEL DE ACEITE DE TRANSMISIÓN Y HIDRÁULICO',
+    'item201': 'UÑAS Y CADENA DE LEVANTE',
+    'item202': 'BRAZO DE SOPORTE',
+    'item203': '---',
+    'item204': 'ESTADO DE RUEDA GUÍA Y SPROCKET',
+    'item205': 'ESTADO DE CONTROL DE MANDOS ',
+    'item300': 'ESTADO DE ROLA',
+    'item301': 'LAS GOMAS DE LA ROLA',
+    'item400': 'TOLDERA ',
+    'item401': 'CINTA REFLECTIVA VISIBLE',
+    'item402': 'GANCHOS DE COMPUERTA TRASERA',
+    'item403': 'TEMPLADORES DE LA COMPUERTA',
+    'item404': 'REVISIÓN DE LA TOLVA (BASE, PINES DE COMPUERTA)',
+    'item405': 'FUGAS DE ACEITE DE PISTÓN DE LEVANTE Y TANQUE HIDRÁULICO',
+    'item500': 'ACCESORIOS DE LA PLUMA Y PLATAFORMA',
+    'item501': 'ACCESORIOS DE IZAJE',
+    'item600': 'TANQUE - CONTOMETRO Y PISTOLA SURTIDORA AUTOMÁTICA',
+    'item601': 'BOMBA DE AGUA '
+} %}
+{% set nc_daily = [] %}
+{% for key, value in checklist.items() %}
+    {% if key in checklist_desc and value in ['C','NC'] %}
+        <tr>
+            <td>{{ checklist_desc[key] }}</td>
+            <td style="text-align:center;">{{ value }}</td>
+        </tr>
+        {% if value == 'NC' %}
+            {% set nc_daily = nc_daily + [checklist_desc[key]] %}
+        {% endif %}
     {% endif %}
-</div>
-{% endif %}
-{% if tools_check and tools_check.foto %}
-<div class="foto-adjunta">
-    <h3>Foto adjunta - Herramientas y Equipos de Seguridad</h3>
-    {% if pdf_mode %}
-       <img src="file:///{{ app_root }}/static/uploads/{{ tools_check.foto }}" alt="Foto adjunta Herramientas y Equipos de Seguridad" class="foto-adjunta">
-    {% else %}
-       <img src="/uploads/{{ tools_check.foto }}" ...>
-    {% endif %}
-</div>
-{% endif %}        'item204': 'ESTADO DE RUEDA GUÍA Y SPROCKET',
-                'item205': 'ESTADO DE CONTROL DE MANDOS ',
-                'item300': 'ESTADO DE ROLA',
-                'item301': 'LAS GOMAS DE LA ROLA',
-                'item400': 'TOLDERA ',
-                'item401': 'CINTA REFLECTIVA VISIBLE',
-                'item402': 'GANCHOS DE COMPUERTA TRASERA',
-                'item403': 'TEMPLADORES DE LA COMPUERTA',
-                'item404': 'REVISIÓN DE LA TOLVA (BASE, PINES DE COMPUERTA)',
-                'item405': 'FUGAS DE ACEITE DE PISTÓN DE LEVANTE Y TANQUE HIDRÁULICO',
-                'item500': 'ACCESORIOS DE LA PLUMA Y PLATAFORMA',
-                'item501': 'ACCESORIOS DE IZAJE',
-                'item600': 'TANQUE - CONTOMETRO Y PISTOLA SURTIDORA AUTOMÁTICA',
-                'item601': 'BOMBA DE AGUA '
-            } %}
-            {% for key, value in checklist.items() %}
-                {% if key in checklist_desc and value in ['C','NC'] %}
-                <tr>
-                    <td>{{ checklist_desc[key] }}</td>
-                    <td style="text-align:center;">{{ value }}</td>
-                </tr>
-                {% endif %}
-            {% endfor %}
+{% endfor %}
             </tbody>
         </table>
         {% endif %}

@@ -122,6 +122,9 @@
             .checklist-label { min-width: 120px; font-size: 1em; }
             .header-flex .logo-header img { height: 44px; margin-left: 8px; }
         }
+        .flashes { list-style: none; padding: 0; margin: 0 0 18px 0; }
+        .flash-error { color: #b91c1c; background: #fee2e2; border: 1px solid #fca5a5; padding: 8px 14px; border-radius: 6px; margin-bottom: 8px; }
+        .flash-success { color: #166534; background: #bbf7d0; border: 1px solid #4ade80; padding: 8px 14px; border-radius: 6px; margin-bottom: 8px; }
     </style>
 </head>
 <body>
@@ -438,7 +441,11 @@ var EQUIPO_TYPE_BACKEND = {{ equipo_type_backend|tojson|safe }};
             if (!form.dataset.submitted) {
                 e.preventDefault();
                 form.dataset.submitted = "true";
-                setTimeout(() => form.submit(), 10);
+                console.log('[Checklist] Enviando formulario...');
+                setTimeout(() => {
+                    console.log('[Checklist] Ejecutando form.submit()');
+                    form.submit();
+                }, 10);
             }
         });
     });

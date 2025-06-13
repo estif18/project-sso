@@ -424,7 +424,13 @@ var EQUIPO_TYPE_BACKEND = {{ equipo_type_backend|tojson|safe }};
             // Recorre la cadena de padres para detectar si está oculto
             while (el && el !== document.body) {
                 const style = window.getComputedStyle(el);
-                if (style.display === 'none' || style.visibility === 'hidden' || el.offsetParent === null) {
+                if (
+                    style.display === 'none' ||
+                    style.visibility === 'hidden' ||
+                    el.offsetParent === null ||
+                    style.opacity === '0' ||
+                    (style.position === 'absolute' && parseInt(style.left) < -9000)
+                ) {
                     hidden = true;
                     break;
                 }

@@ -2,6 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chequeo de Herramientas y Equipos de Seguridad</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
@@ -390,13 +392,46 @@ function toggleFechaRow(radioName, rowId, inputId) {
             break;
         }
     }
+    var fechaInput = document.getElementById(inputId);
     if (checkedValue === 'C') {
         fechaRow.style.display = '';
+        if (fechaInput) fechaInput.required = false; // No requerido por defecto
     } else {
         fechaRow.style.display = 'none';
-        document.getElementById(inputId).value = '';
+        if (fechaInput) {
+            fechaInput.value = '';
+            fechaInput.required = false; // Eliminar required si está oculto
+        }
     }
 }
+
+// Elimina required de todos los inputs ocultos antes de submit
+function removeRequiredFromHiddenInputs(form) {
+    var allInputs = form.querySelectorAll('input, select, textarea');
+    allInputs.forEach(function(input) {
+        let el = input;
+        let hidden = false;
+        // También considera opacity:0 y position:absolute como oculto
+        while (el && el !== document.body) {
+            const style = window.getComputedStyle(el);
+            if (
+                style.display === 'none' ||
+                style.visibility === 'hidden' ||
+                el.offsetParent === null ||
+                style.opacity === '0' ||
+                (style.position === 'absolute' && parseInt(style.left) < -9000)
+            ) {
+                hidden = true;
+                break;
+            }
+            el = el.parentElement;
+        }
+        if (hidden) {
+            input.required = false;
+        }
+    });
+}
+
 window.onload = function() {
     // EXTINTOR
     var radiosExt = document.getElementsByName('herr_item4');
@@ -410,6 +445,30 @@ window.onload = function() {
         radiosSoat[i].addEventListener('change', function() { toggleFechaRow('otros_soat', 'soat_fecha_row', 'otros_soat_fecha'); });
     }
     toggleFechaRow('otros_soat', 'soat_fecha_row', 'otros_soat_fecha');
+
+    // Refuerzo: submit robusto
+    var form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            removeRequiredFromHiddenInputs(form);
+            setTimeout(function() {
+                if (form.checkValidity()) {
+                    form.submit();
+                } else {
+                    let msg = document.getElementById('form-error-msg');
+                    if (!msg) {
+                        msg = document.createElement('div');
+                        msg.id = 'form-error-msg';
+                        msg.style = 'color:#b91c1c; font-weight:bold; text-align:center; margin-bottom:12px;';
+                        msg.innerText = 'Por favor, responde todas las preguntas obligatorias visibles antes de guardar.';
+                        form.parentNode.insertBefore(msg, form);
+                    }
+                    form.reportValidity();
+                }
+            }, 0);
+            e.preventDefault();
+        });
+    }
 };
 </script>
 </body>

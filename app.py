@@ -260,6 +260,53 @@ def checklist(submission_id):
                 corregir_orientacion_imagen(filepath)
             else:
                 flash('Formato de imagen no permitido.', 'error')
+        # --- AUTOCOMPLETAR CON NA SEGÚN EL TIPO DE EQUIPO ---
+        tipo_equipo = asset.type.strip().lower() if asset and asset.type else ''
+        # Definir los grupos relevantes por tipo de equipo
+        grupos_por_equipo = {
+            'camioneta': ['general_apagado', 'general_encendido'],
+            'ambulancia': ['general_apagado', 'general_encendido'],
+            'cargador frontal': ['general_apagado', 'general_encendido', 'cargador'],
+            'retroexcavadora': ['general_apagado', 'general_encendido', 'cargador'],
+            'excavadora': ['general_apagado', 'general_encendido', 'cargador'],
+            'montacarga': ['general_apagado', 'general_encendido', 'cargador'],
+            'minicargador': ['general_apagado', 'general_encendido', 'cargador'],
+            'tractor': ['general_apagado', 'general_encendido', 'cargador'],
+            'grúa': ['general_apagado', 'general_encendido', 'grua'],
+            'cisterna': ['general_apagado', 'general_encendido', 'cisterna'],
+            'utilitario': ['general_apagado', 'general_encendido', 'cisterna'],
+            'volquete': ['general_apagado', 'general_encendido', 'volquete'],
+        }
+        # Mapear los grupos a los campos del checklist
+        grupos_items = {
+            'general_apagado': [f'item{i}' for i in range(0,20)],
+            'general_encendido': [f'item{100+i}' for i in range(1,10)],
+            'cargador': [f'item{200+i}' for i in range(1,7)],
+            'rodillo': [f'item{300+i}' for i in range(1,3)],
+            'volquete': [f'item{400+i}' for i in range(1,7)],
+            'grua': [f'item{500+i}' for i in range(1,3)],
+            'cisterna': [f'item{600+i}' for i in range(1,3)]
+        }
+        # Determinar los grupos relevantes para el equipo actual
+        grupos_relevantes = []
+        for key, grupos in grupos_por_equipo.items():
+            if key in tipo_equipo:
+                grupos_relevantes = grupos
+                break
+        # Si hay grupos relevantes, autocompletar el resto con NA
+        if grupos_relevantes:
+            # Todos los posibles campos del checklist diario
+            all_items = set()
+            for items in grupos_items.values():
+                all_items.update(items)
+            # Los campos requeridos para este equipo
+            requeridos = set()
+            for grupo in grupos_relevantes:
+                requeridos.update(grupos_items[grupo])
+            # Autocompletar con NA los que no son requeridos
+            for key in all_items:
+                if key not in requeridos and key not in checklist:
+                    checklist[key] = 'NA'
         # Crear registro en DailyChecklist
         daily = DailyChecklist(
             submission_id=submission.id,
@@ -531,7 +578,7 @@ def all_reports():
     if selected_company:
         submissions_query = submissions_query.filter_by(company_id=selected_company)
     if selected_asset:
-        submissions_query = submissions_query.filter_by(asset_id=selected_asset)
+        submissions_query = submissions_query.filter_by(asset_id=selectedAsset)
     if selected_worker:
         submissions_query = submissions_query.filter_by(worker_id=selected_worker)
     submissions = submissions_query.all()

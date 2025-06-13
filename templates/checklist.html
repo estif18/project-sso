@@ -305,5 +305,106 @@
         <button type="submit" style="background: linear-gradient(90deg, #3182ce 0%, #63b3ed 100%); color: #fff; padding: 10px 28px; border-radius: 6px; font-size: 1.1em; font-weight: 600; border:none;">Guardar Checklist</button>
     </div>
     </form>
+    <script>
+// --- Mostrar/ocultar secciones según tipo de equipo ---
+function getEquipoType() {
+    // Busca el select en la página anterior (formulario principal)
+    try {
+        // Si el checklist se abre como nueva página, buscar en opener
+        if (window.opener) {
+            const select = window.opener.document.getElementById('asset_type');
+            return select ? select.value : '';
+        }
+    } catch(e) {}
+    // O buscar en la propia página si el select está presente
+    const select = document.getElementById('asset_type');
+    return select ? select.value : '';
+}
+
+function updateChecklistVisibility() {
+    const equipo = getEquipoType().toLowerCase();
+    // Secciones
+    const secciones = [
+        { key: 'general-apagado', th: 'GENERAL (EQUIPO APAGADO)' },
+        { key: 'general-encendido', th: 'GENERAL (MOTOR ENCENDIDO)' },
+        { key: 'cargador', th: 'CARGADOR FRONTAL, RETROEXCAVADORA, EXCAVADORA, MONTACARGA, MINICARGADOR Y TRACTOR' },
+        { key: 'rodillo', th: 'RODILLO COMPACTADOR' },
+        { key: 'volquete', th: 'VOLQUETE' },
+        { key: 'grua', th: 'GRÚA' },
+        { key: 'cisterna', th: 'CISTERNA Y UTILITARIO' }
+    ];
+    // Solo mostrar generales para camioneta y ambulancia
+    const soloGenerales = equipo.includes('camioneta') || equipo.includes('ambulancia');
+    document.querySelectorAll('.checklist-section-title').forEach(th => {
+        const text = th.textContent.trim().toUpperCase();
+        if (soloGenerales) {
+            if (text.includes('GENERAL')) {
+                th.parentElement.parentElement.style.display = '';
+            } else {
+                th.parentElement.parentElement.style.display = 'none';
+            }
+        } else {
+            th.parentElement.parentElement.style.display = '';
+        }
+    });
+    // Ocultar filas de preguntas de secciones ocultas
+    if (soloGenerales) {
+        let show = false;
+        document.querySelectorAll('.checklist-table tr').forEach(tr => {
+            if (tr.querySelector('.checklist-section-title')) {
+                const t = tr.textContent.trim().toUpperCase();
+                show = t.includes('GENERAL');
+            } else if (tr.querySelector('.checklist-label')) {
+                tr.style.display = show ? '' : 'none';
+            }
+        });
+    } else {
+        document.querySelectorAll('.checklist-table tr').forEach(tr => tr.style.display = '');
+    }
+}
+
+// Lógica para autocompletar con NA los campos ocultos antes de enviar
+function autoFillHiddenWithNA() {
+    const equipo = getEquipoType().toLowerCase();
+    const soloGenerales = equipo.includes('camioneta') || equipo.includes('ambulancia');
+    if (!soloGenerales) return;
+    // Para cada input radio de preguntas ocultas, marcar NA
+    let show = false;
+    document.querySelectorAll('.checklist-table tr').forEach(tr => {
+        if (tr.querySelector('.checklist-section-title')) {
+            const t = tr.textContent.trim().toUpperCase();
+            show = t.includes('GENERAL');
+        } else if (tr.querySelector('.checklist-label')) {
+            if (!show) {
+                // Buscar input radio NA y marcarlo
+                const naRadio = tr.querySelector('input[type="radio"][value="NA"]');
+                if (naRadio) naRadio.checked = true;
+            }
+        }
+    });
+}
+
+// Detectar cambios en tipo de equipo (desde opener o propio)
+window.addEventListener('DOMContentLoaded', function() {
+    updateChecklistVisibility();
+    // Si el select está en la misma página
+    const select = document.getElementById('asset_type');
+    if (select) select.addEventListener('change', updateChecklistVisibility);
+    // Si viene de opener, escuchar cambios
+    if (window.opener) {
+        try {
+            const openerSelect = window.opener.document.getElementById('asset_type');
+            if (openerSelect) openerSelect.addEventListener('change', function() {
+                updateChecklistVisibility();
+            });
+        } catch(e) {}
+    }
+    // Al enviar el formulario, autocompletar con NA
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function() {
+        autoFillHiddenWithNA();
+    });
+});
+</script>
 </body>
 </html>

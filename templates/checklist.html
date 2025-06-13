@@ -321,8 +321,13 @@ function getEquipoType() {
     return select ? select.value : '';
 }
 
+function normalizeEquipo(str) {
+    return str ? str.trim().toLowerCase().normalize('NFD').replace(/\s+/g, ' ') : '';
+}
+
 function updateChecklistVisibility() {
-    const equipo = getEquipoType().toLowerCase();
+    const equipoRaw = getEquipoType();
+    const equipo = normalizeEquipo(equipoRaw);
     // Definir los grupos relevantes por tipo de equipo (igual que backend)
     const gruposPorEquipo = {
         'camioneta': ['GENERAL (EQUIPO APAGADO)', 'GENERAL (MOTOR ENCENDIDO)'],
@@ -341,7 +346,7 @@ function updateChecklistVisibility() {
     // Determinar los grupos relevantes para el equipo actual
     let gruposRelevantes = [];
     for (const key in gruposPorEquipo) {
-        if (equipo.includes(key)) {
+        if (equipo === key || equipo.includes(key)) {
             gruposRelevantes = gruposPorEquipo[key];
             break;
         }
@@ -372,8 +377,9 @@ function updateChecklistVisibility() {
 
 // Lógica para autocompletar con NA los campos ocultos antes de enviar
 function autoFillHiddenWithNA() {
-    const equipo = getEquipoType().toLowerCase();
-    const soloGenerales = equipo.includes('camioneta') || equipo.includes('ambulancia');
+    const equipoRaw = getEquipoType();
+    const equipo = normalizeEquipo(equipoRaw);
+    const soloGenerales = equipo === 'camioneta' || equipo === 'ambulancia' || equipo.includes('camioneta') || equipo.includes('ambulancia');
     if (!soloGenerales) return;
     // Para cada input radio de preguntas ocultas, marcar NA
     let show = false;

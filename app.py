@@ -10,6 +10,7 @@ from sqlalchemy import Enum as SqlEnum, text
 from PIL import Image, ExifTags
 
 import mysql.connector # Added
+import unicodedata
 
 def test_mysql_connector():
     try:
@@ -261,7 +262,15 @@ def checklist(submission_id):
             else:
                 flash('Formato de imagen no permitido.', 'error')
         # --- AUTOCOMPLETAR CON NA SEGÚN EL TIPO DE EQUIPO ---
-        tipo_equipo = asset.type.strip().lower() if asset and asset.type else ''
+        def normalize_equipo(s):
+            if not s:
+                return ''
+            s = s.strip().lower()
+            s = unicodedata.normalize('NFD', s)
+            s = ''.join(c for c in s if unicodedata.category(c) != 'Mn')
+            s = ' '.join(s.split())
+            return s
+        tipo_equipo = normalize_equipo(asset.type) if asset and asset.type else ''
         # Definir los grupos relevantes por tipo de equipo
         grupos_por_equipo = {
             'camioneta': ['general_apagado', 'general_encendido'],
@@ -272,7 +281,7 @@ def checklist(submission_id):
             'montacarga': ['general_apagado', 'general_encendido', 'cargador'],
             'minicargador': ['general_apagado', 'general_encendido', 'cargador'],
             'tractor': ['general_apagado', 'general_encendido', 'cargador'],
-            'grúa': ['general_apagado', 'general_encendido', 'grua'],
+            'grua': ['general_apagado', 'general_encendido', 'grua'],
             'cisterna': ['general_apagado', 'general_encendido', 'cisterna'],
             'utilitario': ['general_apagado', 'general_encendido', 'cisterna'],
             'volquete': ['general_apagado', 'general_encendido', 'volquete'],
@@ -290,7 +299,8 @@ def checklist(submission_id):
         # Determinar los grupos relevantes para el equipo actual
         grupos_relevantes = []
         for key, grupos in grupos_por_equipo.items():
-            if key in tipo_equipo:
+            key_norm = normalize_equipo(key)
+            if tipo_equipo == key_norm or key_norm in tipo_equipo or tipo_equipo in key_norm:
                 grupos_relevantes = grupos
                 break
         # Si hay grupos relevantes, autocompletar el resto con NA

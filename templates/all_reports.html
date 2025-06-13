@@ -127,9 +127,16 @@
                         {% set _ = diario_vals.append(checklist[k]) %}
                     {% endif %}
                 {% endfor %}
+                {# CORRECCIÓN: Si hay al menos un NC, debe ser No cumple, aunque haya NA #}
                 {% if diario_vals and diario_vals|select('equalto', 'NC')|list|length > 0 %}
                     {% set cumple_diario = 'No cumple' %}
                 {% elif diario_vals and diario_vals|select('equalto', 'NA')|list|length == diario_vals|length %}
+                    {% set cumple_diario = 'No aplica' %}
+                {% elif diario_vals and diario_vals|select('equalto', 'C')|list|length == diario_vals|length %}
+                    {% set cumple_diario = 'Cumple' %}
+                {% elif diario_vals and diario_vals|select('equalto', 'C')|list|length > 0 and diario_vals|select('equalto', 'NA')|list|length > 0 and diario_vals|select('equalto', 'NC')|list|length == 0 %}
+                    {% set cumple_diario = 'Cumple' %}
+                {% else %}
                     {% set cumple_diario = 'No aplica' %}
                 {% endif %}
                 <td>

@@ -42,6 +42,9 @@ app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024  # 20MB máximo
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 db = SQLAlchemy(app)
 
+# Configuración explícita de la ruta de wkhtmltopdf para pdfkit en Windows
+PDFKIT_CONFIG = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
+
 # Modelos para empresas y trabajadores
 class Company(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -557,7 +560,7 @@ def report_pdf(submission_id):
     )
     options = {'enable-local-file-access': None, 'quiet': ''}
     try:
-        pdf = pdfkit.from_string(rendered, False, options=options)
+        pdf = pdfkit.from_string(rendered, False, options=options, configuration=PDFKIT_CONFIG)
     except Exception as e:
         print(f"Error generating PDF: {e}")
         flash('Error al generar el PDF.', 'error')

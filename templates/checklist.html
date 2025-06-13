@@ -415,38 +415,28 @@ var EQUIPO_TYPE_BACKEND = {{ equipo_type_backend|tojson|safe }};
         });
     }
 
-    // Lógica para autocompletar con NA los campos ocultos antes de enviar
+    // Lógica para autocompletar con NA y quitar required de radios ocultos antes de enviar
     function autoFillHiddenWithNA() {
-        // Para cada grupo de radios por pregunta
-        document.querySelectorAll('.checklist-table tr').forEach(tr => {
-            // Si la fila está oculta (por cualquier motivo)
-            if (tr.offsetParent === null || tr.style.display === 'none') {
-                // Buscar input radio NA y marcarlo
-                const naRadio = tr.querySelector('input[type="radio"][value="NA"]');
-                if (naRadio) naRadio.checked = true;
-                // Quitar required de todos los radios de la fila
-                tr.querySelectorAll('input[type="radio"]').forEach(radio => {
-                    radio.required = false;
-                });
-            }
-        });
-        // Además, quitar required de cualquier input radio oculto individualmente o por cualquier contenedor
+        // Para cada input radio del checklist
         document.querySelectorAll('input[type="radio"]').forEach(radio => {
             let el = radio;
             let hidden = false;
-            while (el) {
-                if (el.style && (el.style.display === 'none' || el.style.visibility === 'hidden')) {
-                    hidden = true;
-                    break;
-                }
-                if (el.offsetParent === null && el !== document.body) {
+            // Recorre la cadena de padres para detectar si está oculto
+            while (el && el !== document.body) {
+                const style = window.getComputedStyle(el);
+                if (style.display === 'none' || style.visibility === 'hidden' || el.offsetParent === null) {
                     hidden = true;
                     break;
                 }
                 el = el.parentElement;
             }
             if (hidden) {
+                // Quitar required
                 radio.required = false;
+                // Si es el radio NA, marcarlo
+                if (radio.value === 'NA') {
+                    radio.checked = true;
+                }
             }
         });
     }
@@ -469,13 +459,12 @@ var EQUIPO_TYPE_BACKEND = {{ equipo_type_backend|tojson|safe }};
         // Al enviar el formulario, autocompletar con NA y dejar que el submit siga normal
         const form = document.querySelector('form');
         form.addEventListener('submit', function(e) {
-            e.preventDefault(); // Prevenir submit por defecto
+            e.preventDefault();
             autoFillHiddenWithNA();
             setTimeout(function() {
                 if (form.checkValidity()) {
                     form.submit();
                 } else {
-                    // Mostrar mensaje de error si algún campo visible falta
                     let msg = document.getElementById('form-error-msg');
                     if (!msg) {
                         msg = document.createElement('div');

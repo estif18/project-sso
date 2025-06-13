@@ -352,6 +352,16 @@ var EQUIPO_TYPE_BACKEND = {{ equipo_type_backend|tojson|safe }};
         };
         // Determinar los grupos relevantes para el equipo actual (solo igualdad exacta)
         let gruposRelevantes = gruposPorEquipo[equipo] || [];
+        // Si no hay tipo de equipo, mostrar todo
+        if (!equipo || gruposRelevantes.length === 0) {
+            document.querySelectorAll('.checklist-section-title').forEach(th => {
+                th.parentElement.parentElement.style.display = '';
+            });
+            document.querySelectorAll('.checklist-table tr').forEach(tr => {
+                tr.style.display = '';
+            });
+            return;
+        }
         // Mostrar solo los grupos relevantes
         document.querySelectorAll('.checklist-section-title').forEach(th => {
             const text = th.textContent.trim().toUpperCase();

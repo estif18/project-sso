@@ -415,28 +415,30 @@ var EQUIPO_TYPE_BACKEND = {{ equipo_type_backend|tojson|safe }};
         });
     }
 
-    // Lógica para autocompletar con NA y quitar required de radios ocultos antes de enviar
+    // Lógica para autocompletar con NA y quitar required de inputs ocultos antes de enviar
+    function isReallyHidden(input) {
+        let el = input;
+        while (el && el !== document.body) {
+            const style = window.getComputedStyle(el);
+            if (
+                style.display === 'none' ||
+                style.visibility === 'hidden' ||
+                el.offsetParent === null ||
+                style.opacity === '0' ||
+                (style.position === 'absolute' && parseInt(style.left) < -9000) ||
+                style.width === '0px' || style.height === '0px'
+            ) {
+                return true;
+            }
+            el = el.parentElement;
+        }
+        return false;
+    }
+
     function autoFillHiddenWithNA() {
         // Para cada input radio del checklist
         document.querySelectorAll('input[type="radio"]').forEach(radio => {
-            let el = radio;
-            let hidden = false;
-            // Recorre la cadena de padres para detectar si está oculto
-            while (el && el !== document.body) {
-                const style = window.getComputedStyle(el);
-                if (
-                    style.display === 'none' ||
-                    style.visibility === 'hidden' ||
-                    el.offsetParent === null ||
-                    style.opacity === '0' ||
-                    (style.position === 'absolute' && parseInt(style.left) < -9000)
-                ) {
-                    hidden = true;
-                    break;
-                }
-                el = el.parentElement;
-            }
-            if (hidden) {
+            if (isReallyHidden(radio)) {
                 radio.required = false;
                 if (radio.value === 'NA') {
                     radio.checked = true;
@@ -445,10 +447,15 @@ var EQUIPO_TYPE_BACKEND = {{ equipo_type_backend|tojson|safe }};
         });
         // Refuerzo: quitar required de cualquier input requerido oculto (no solo radios)
         document.querySelectorAll('input[required]').forEach(input => {
-            if (!input.offsetParent) {
+            if (isReallyHidden(input)) {
                 input.removeAttribute('required');
             }
         });
+        // Debug: log de inputs requeridos ocultos
+        const stillHidden = Array.from(document.querySelectorAll('input[required]')).filter(isReallyHidden);
+        if (stillHidden.length > 0) {
+            console.warn('[Checklist] Inputs requeridos ocultos detectados al enviar:', stillHidden.map(i => i.name || i.id));
+        }
     }
 
     // Detectar cambios en tipo de equipo (desde opener o propio)

@@ -275,6 +275,23 @@ def checklist(submission_id):
             flash(f'Faltan respuestas en: {", ".join(missing)}. Revisa el autocompletado de NA.', 'error')
             print('FALTAN CAMPOS:', missing)
             return render_template('checklist.html', submission=submission, company=company, worker=worker, asset=asset)
+        # --- VALIDACIÓN DE TODOS LOS CAMPOS REQUERIDOS SEGÚN EL TIPO DE EQUIPO ---
+        # Determinar los grupos relevantes para el equipo actual
+        tipo_equipo = normalize_equipo(asset.type) if asset and asset.type else ''
+        grupos_relevantes = grupos_por_equipo.get(tipo_equipo, [])
+        # Obtener todos los campos requeridos para este equipo
+        requeridos = set()
+        for grupo in grupos_relevantes:
+            requeridos.update(grupos_items[grupo])
+        # Validar que todos los campos requeridos estén presentes y respondidos
+        missing = []
+        for key in requeridos:
+            if key not in checklist or checklist.get(key) in (None, '', 'None'):
+                missing.append(key)
+        if missing:
+            flash(f'Faltan respuestas en: {", ".join(missing)}. Revisa el autocompletado de NA.', 'error')
+            print('FALTAN CAMPOS:', missing)
+            return render_template('checklist.html', submission=submission, company=company, worker=worker, asset=asset)
         # Guardar observaciones
         observaciones = request.form.get('observaciones', '')
         # Guardar foto si se adjunta

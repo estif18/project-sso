@@ -246,6 +246,41 @@ def checklist(submission_id):
     company = Company.query.get(submission.company_id)
     worker = Worker.query.get(submission.worker_id)
     asset = Asset.query.get(submission.asset_id)
+
+    # Definir función y diccionarios al inicio para ambos métodos
+    import unicodedata
+    def normalize_equipo(s):
+        if not s:
+            return ''
+        s = s.strip().lower()
+        s = unicodedata.normalize('NFD', s)
+        s = ''.join(c for c in s if unicodedata.category(c) != 'Mn')
+        s = ' '.join(s.split())
+        return s
+
+    grupos_por_equipo = {
+        normalize_equipo('camioneta'): ['general_apagado', 'general_encendido'],
+        normalize_equipo('ambulancia'): ['general_apagado', 'general_encendido'],
+        normalize_equipo('cargador frontal'): ['general_apagado', 'general_encendido', 'cargador'],
+        normalize_equipo('retroexcavadora'): ['general_apagado', 'general_encendido', 'cargador'],
+        normalize_equipo('excavadora'): ['general_apagado', 'general_encendido', 'cargador'],
+        normalize_equipo('montacarga'): ['general_apagado', 'general_encendido', 'cargador'],
+        normalize_equipo('minicargador'): ['general_apagado', 'general_encendido', 'cargador'],
+        normalize_equipo('tractor'): ['general_apagado', 'general_encendido', 'cargador'],
+        normalize_equipo('grua'): ['general_apagado', 'general_encendido', 'grua'],
+        normalize_equipo('cisterna'): ['general_apagado', 'general_encendido', 'cisterna'],
+        normalize_equipo('utilitario'): ['general_apagado', 'general_encendido', 'cisterna'],
+        normalize_equipo('volquete'): ['general_apagado', 'general_encendido', 'volquete'],
+    }
+    grupos_items = {
+        'general_apagado': [f'item{i}' for i in range(0,20)],
+        'general_encendido': [f'item{100+i}' for i in range(1,10)],
+        'cargador': [f'item{200+i}' for i in range(1,7)],
+        'rodillo': [f'item{300+i}' for i in range(1,3)],
+        'volquete': [f'item{400+i}' for i in range(1,7)],
+        'grua': [f'item{500+i}' for i in range(1,3)],
+        'cisterna': [f'item{600+i}' for i in range(1,3)]
+    }
     if request.method == 'POST':
         checklist = dict(request.form)
         # DEBUG: Mostrar en consola los datos recibidos

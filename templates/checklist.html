@@ -305,10 +305,10 @@
         <button type="submit" style="background: linear-gradient(90deg, #3182ce 0%, #63b3ed 100%); color: #fff; padding: 10px 28px; border-radius: 6px; font-size: 1.1em; font-weight: 600; border:none;">Guardar Checklist</button>
     </div>
     </form>
+    {% set equipo_type_backend = asset.type if asset and asset.type else '' %}
     <script>
 // --- Mostrar/ocultar secciones según tipo de equipo ---
-// Obtener el tipo de equipo desde el backend si no hay select
-let EQUIPO_TYPE_BACKEND = "{{ asset.type|e('js') if asset and asset.type else '' }}";
+let EQUIPO_TYPE_BACKEND = {{ equipo_type_backend|tojson }};
 
 function getEquipoType() {
     // Busca el select en la página anterior (formulario principal)

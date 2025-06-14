@@ -424,9 +424,13 @@
             {% if not pdf_mode %}
             <script type="application/javascript">
             //<![CDATA[
-            var checklistRows = {{ checklist_rows|tojson|safe }};
-            var hasObservaciones = {{ _has_obs|tojson|safe }};
-            var observaciones = {{ _obs|tojson|safe }};
+            var checklistRows = [];
+            var hasObservaciones = false;
+            var observaciones = '';
+            // Los siguientes bloques solo se procesan por Jinja2 en el backend, no en el navegador
+            {% if checklist_rows is defined %}checklistRows = {{ checklist_rows|tojson|safe }};{% endif %}
+            {% if _has_obs is defined %}hasObservaciones = {{ _has_obs|tojson|safe }};{% endif %}
+            {% if _obs is defined %}observaciones = {{ _obs|tojson|safe }};{% endif %}
             //]]>
             </script>
             <div id="pdf-buttons" style="margin-top: 20px;">

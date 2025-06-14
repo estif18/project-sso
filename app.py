@@ -289,13 +289,6 @@ def checklist(submission_id):
         plantilla = 'checklist_cargador_frontal.html'
         plantilla_asignada = True
     # Puedes agregar más elif para otros tipos de equipo
-    # --- Mensaje de depuración y flash informativo ---
-    if plantilla_asignada:
-        flash(f"Plantilla seleccionada: {plantilla} para tipo de equipo '{asset.type}' (normalizado: '{tipo_equipo_norm}')", 'info')
-        print(f"[INFO] Plantilla seleccionada: {plantilla} para tipo de equipo '{asset.type}' (normalizado: '{tipo_equipo_norm}')")
-    else:
-        flash(f"Advertencia: El tipo de equipo '{asset.type}' no tiene checklist específico. Se usará el general.", 'warning')
-        print(f"[DEBUG] Tipo de equipo no reconocido para plantilla específica: '{asset.type}' (normalizado: '{tipo_equipo_norm}')")
 
     grupos_por_equipo = {
         normalize_equipo('camioneta'): ['general_apagado', 'general_encendido'],

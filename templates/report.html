@@ -2,12 +2,12 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=900, user-scalable=yes">
+    <meta name="viewport" content="width=1000, user-scalable=yes">
     <title>Reporte de Checklist</title>
     <style>
     body {
-        font-family: 'DejaVu Sans', 'Arial', 'Helvetica Neue', Helvetica, sans-serif;
-        font-size: 13.5px;
+        font-family: 'Arial', 'Calibri', 'DejaVu Sans', 'Helvetica Neue', Helvetica, sans-serif;
+        font-size: 12.2px;
         color: #222;
         background: #fff;
         margin: 0;
@@ -16,147 +16,184 @@
     /* --- Borde tipo documento Word para PDF y pantalla --- */
     .pdf-outer {
         background: #fff;
-        padding: 40px 0; /* margen blanco superior/inferior */
-        min-width: 1000px;
+        padding: 48px 0; /* margen blanco superior/inferior */
+        min-width: 1100px;
         display: flex;
         justify-content: center;
     }
     .pdf-container {
         background: #fff;
-        border: 6px double #1a237e;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-        border-radius: 12px;
-        max-width: 900px;
-        min-width: 900px;
+        border: 10px double #1a237e;
+        box-shadow: none;
+        border-radius: 0;
+        max-width: 1000px;
+        min-width: 1000px;
         margin: 0;
-        padding: 48px 54px 36px 54px;
+        padding: 0 48px 0 48px;
         position: relative;
+        page-break-inside: avoid;
+    }
+    /* Separador superior e inferior tipo hoja Word */
+    .page-separator {
+        border-top: 3.5px solid #1a237e;
+        border-bottom: 3.5px solid #1a237e;
+        height: 0;
+        margin: 0 0 18px 0;
+        width: 100%;
     }
     .header-flex {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 18px;
-        border-bottom: 2.5px solid #1a237e;
-        padding-bottom: 10px;
+        margin-bottom: 10px;
+        border-bottom: none;
+        padding-bottom: 0;
     }
     .header-flex .logo-header img {
-        height: 70px;
-        margin-left: 24px;
+        height: 60px;
+        margin-left: 0;
     }
     .header-flex .header-title {
         flex: 1;
         text-align: center;
     }
     .header-flex .header-title h1 {
-        font-size: 2.3em;
-        margin: 0 0 6px 0;
+        font-size: 1.25em;
+        margin: 0 0 2px 0;
         color: #1a237e;
-        font-weight: 800;
-        letter-spacing: 1.2px;
+        font-weight: bold;
+        letter-spacing: 0.5px;
         text-transform: uppercase;
     }
     .header-flex .header-title h2 {
-        font-size: 1.1em;
+        font-size: 1em;
         color: #444;
         font-weight: 400;
         margin: 0;
+        text-transform: uppercase;
+    }
+    h2, h3, h4 {
+        text-transform: uppercase;
+        font-weight: bold;
+        color: #1a237e;
+        margin-bottom: 6px;
+        margin-top: 18px;
+        font-size: 1.05em;
     }
     h3.section-title {
-        background: #1a237e;
-        color: #fff;
-        font-weight: 700;
-        font-size: 1.08em;
-        padding: 8px 14px;
-        border-radius: 6px 6px 0 0;
+        background: #e3e6f3;
+        color: #1a237e;
+        font-weight: bold;
+        font-size: 1em;
+        padding: 6px 10px;
+        border-radius: 0;
         margin-bottom: 0;
         letter-spacing: 0.5px;
+        border-bottom: 1.5px solid #1a237e;
     }
     table {
         width: 100%;
         border-collapse: collapse;
-        margin-bottom: 22px;
-        background: #f9fafb;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+        margin-bottom: 14px;
+        background: #fff;
+        border-radius: 0;
+        box-shadow: none;
+        font-size: 12px;
     }
     th, td {
-        border: 1.5px solid #1a237e;
-        padding: 9px 14px;
+        border: 1px solid #1a237e;
+        padding: 5px 8px;
         text-align: left;
+        vertical-align: middle;
     }
     th {
         background: #e3e6f3;
-        font-weight: 700;
+        font-weight: bold;
         color: #1a237e;
-        font-size: 1.01em;
+        font-size: 1em;
+        text-transform: uppercase;
+        text-align: center;
     }
-    .cumple { color: #2e7d32; font-weight: 700; }
-    .nocumple { color: #b91c1c; font-weight: 700; }
-    .noaplica { color: #888; font-weight: 700; }
+    .cumple { color: #2e7d32; font-weight: bold; }
+    .nocumple { color: #b91c1c; font-weight: bold; }
+    .noaplica { color: #888; font-weight: bold; }
     .observaciones, .foto-adjunta {
-        margin-bottom: 22px;
+        margin-bottom: 14px;
         background: #f1f5f9;
-        border-left: 5px solid #1a237e;
-        padding: 14px 20px;
-        border-radius: 6px;
+        border-left: 4px solid #1a237e;
+        padding: 10px 16px;
+        border-radius: 0;
+        font-size: 12px;
     }
     img.foto-adjunta {
-        max-width: 340px;
-        max-height: 340px;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px #b6c2d1;
+        max-width: 260px;
+        max-height: 260px;
+        border-radius: 0;
+        box-shadow: none;
         display: block;
         margin-top: 8px;
-        border: 2px solid #1a237e;
+        border: 1.5px solid #1a237e;
     }
     .footer {
         text-align: right;
         color: #888;
-        font-size: 12px;
-        margin-top: 40px;
-        border-top: 1.5px solid #1a237e;
-        padding-top: 10px;
+        font-size: 11px;
+        margin-top: 24px;
+        border-top: 1px solid #1a237e;
+        padding-top: 6px;
     }
     .firma {
-        margin-top: 60px;
+        margin-top: 36px;
         display: flex;
         justify-content: flex-end;
         align-items: center;
     }
     .firma .firma-block {
-        border-top: 1.5px solid #1a237e;
-        width: 220px;
+        border-top: 1px solid #1a237e;
+        width: 180px;
         text-align: center;
-        font-size: 13px;
+        font-size: 12px;
         color: #1a237e;
-        padding-top: 6px;
-        margin-left: 40px;
+        padding-top: 4px;
+        margin-left: 24px;
     }
-    /* Fuerzo modo escritorio en móvil: desactivo media queries que cambian el layout */
-    /* Elimino el media query que reduce el header en móvil */
-    /* El usuario verá el reporte igual que en escritorio, con scroll horizontal si es necesario */
     html, body {
-        min-width: 900px;
+        min-width: 1000px;
         overflow-x: auto;
+    }
+    /* Simula salto de página en PDF/impresión */
+    .page-break {
+        page-break-after: always;
+        height: 0;
+        border: none;
+        margin: 0;
+        padding: 0;
     }
     </style>
 </head>
 <body>
     <div class="pdf-outer">
         <div class="pdf-container">
+            <div class="page-separator"></div>
             <div class="header-flex">
                 <div class="logo-header">
                     <img src="{{ url_for('static', filename='logo-minera.png') }}" alt="Minera Santa Luisa">
                 </div>
                 <div class="header-title">
-                    <h1>REPORTE TÉCNICO DE INSPECCIÓN DE EQUIPO</h1>
+                    <h1>CHEQUEO DE PRE-USO DE VEHÍCULOS - CIA MINERA SANTA LUISA S.A</h1>
                     <h2>Formato de Cumplimiento de Checklist Diario y Equipos de Seguridad</h2>
                 </div>
             </div>
-            <h2 style="font-size:1.15em; color:#1a202c; margin-bottom:8px; margin-top:18px;">1. Datos Generales del Registro</h2>
-            <table style="margin-bottom:18px;">
+            <table style="margin-bottom:10px;">
+                <tr><th style="width:180px;">Código</th><td>SGI-MAN-TA-F1</td><th style="width:120px;">Versión</th><td>03</td><th style="width:120px;">Página</th><td>1</td></tr>
+                <tr><th>Fecha de Vigencia</th><td>31/12/2024</td><th colspan="4" style="text-align:right;">U.E.A. BERLIN</th></tr>
+            </table>
+            <table style="margin-bottom:10px;">
+                <tr><th style="width:180px;">CÓDIGO DE EQUIPO</th><td>{{ asset.code }}</td><th>Kilometraje u Horómetro</th><td colspan="3">Inicial: ________  Final: ________</td></tr>
+                <tr><th>DESCRIPCIÓN DE EQUIPO</th><td>{{ asset.type }}</td><th>Conductor</th><td>{{ worker.name }}</td><th>Fecha</th><td>{{ created_at.strftime('%d/%m/%Y') }}</td></tr>
+            </table>
+            <h2 style="font-size:1.05em; color:#1a237e; margin-bottom:6px; margin-top:12px;">1. Datos Generales del Registro</h2>
+            <table style="margin-bottom:10px;">
                 <tr><th>ID de Registro</th><td>{{ submission.id }}</td></tr>
                 <tr><th>Empresa</th><td>{{ company.name }}</td></tr>
                 <tr><th>Trabajador Responsable</th><td>{{ worker.name }}</td></tr>
@@ -167,7 +204,7 @@
             {% set checklist = daily_checklist.to_dict() if daily_checklist else {} %}
             {% set tools_check = tools_check.to_dict() if tools_check else {} %}
             {% if checklist %}
-            <h3 class="section-title" style="margin-top:24px;">2. Checklist Diario de Operación</h3>
+            <h3 class="section-title" style="margin-top:18px;">2. Checklist Diario de Operación</h3>
             <table>
                 <thead>
                     <tr><th style="width:70%;">Descripción del Ítem</th><th style="text-align:center;">Respuesta</th></tr>
@@ -190,7 +227,7 @@
             </table>
             {% endif %}
             {% if tools_check %}
-            <h3 class="section-title" style="margin-top:24px;">3. Herramientas y Equipos de Seguridad</h3>
+            <h3 class="section-title" style="margin-top:18px;">3. Herramientas y Equipos de Seguridad</h3>
             <table>
                 <thead>
                     <tr><th style="width:70%;">Ítem</th><th style="text-align:center;">Respuesta</th></tr>
@@ -265,9 +302,9 @@
             </div>
             {% endif %}
             {% if nc_daily or nc_tools %}
-            <h3 style="color:#b91c1c; margin-top:24px;">8. Ítems No Cumplidos</h3>
+            <h3 style="color:#b91c1c; margin-top:18px;">8. Ítems No Cumplidos</h3>
             {% if nc_daily %}
-            <h4 style="margin-bottom:6px;">Checklist Diario</h4>
+            <h4 style="margin-bottom:4px;">Checklist Diario</h4>
             <ul>
                 {% for desc in nc_daily %}
                 <li>{{ desc }}</li>
@@ -275,7 +312,7 @@
             </ul>
             {% endif %}
             {% if nc_tools %}
-            <h4 style="margin-bottom:6px;">Herramientas y Equipos de Seguridad</h4>
+            <h4 style="margin-bottom:4px;">Herramientas y Equipos de Seguridad</h4>
             <ul>
                 {% for desc in nc_tools %}
                 <li>{{ desc }}</li>
@@ -283,7 +320,7 @@
             </ul>
             {% endif %}
             {% endif %}
-            <h3 style="margin-top:24px;">9. Resumen de Cumplimiento por Grupo</h3>
+            <h3 style="margin-top:18px;">9. Resumen de Cumplimiento por Grupo</h3>
             <table>
                 <thead>
                     <tr><th>Grupo</th><th style="text-align:center;">Cumplimiento</th></tr>
@@ -305,22 +342,16 @@
                 {% endfor %}
                 </tbody>
             </table>
-            {% if not pdf_mode %}
-            <div style="margin-top: 20px;">
-                <a href="{{ url_for('index') }}" style="background: linear-gradient(90deg, #3182ce 0%, #63b3ed 100%); color: #fff; padding: 8px 18px; border-radius: 6px; margin-right: 10px; text-decoration: none; font-weight: 600;">Volver al Formulario</a>
-                <a href="{{ url_for('all_reports') }}" style="background: linear-gradient(90deg, #3182ce 0%, #63b3ed 100%); color: #fff; padding: 8px 18px; border-radius: 6px; text-decoration: none; font-weight: 600;">Ver Todos los Reportes</a>
-                <button id="btn-pdf-navegador" style="background: linear-gradient(90deg, #f59e42 0%, #f6e05e 100%); color: #222; padding: 8px 18px; border-radius: 6px; border:none; font-weight: 600; margin-left: 10px; cursor:pointer;">Generar PDF</button>
-            </div>
-            {% endif %}
-            <div class="footer" style="margin-top:32px;">
+            <div class="footer" style="margin-top:18px;">
                 <b>Reporte generado el {{ created_at.strftime('%d/%m/%Y %H:%M:%S') }}</b><br>
-                <span style="font-size:13px;">Sistema de Gestión de Empresas - Área de Seguridad y Salud Ocupacional</span>
+                <span style="font-size:12px;">Sistema de Gestión de Empresas - Área de Seguridad y Salud Ocupacional</span>
             </div>
             <div class="firma">
                 <div class="firma-block">
-                    Firma y sello responsable<br><br><br>
+                    Firma del Conductor<br><br><br
                 </div>
             </div>
+            <div class="page-separator" style="margin-top:24px;"></div>
         </div>
     </div>
     {% if not pdf_mode %}
@@ -328,7 +359,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
-    document.getElementById('btn-pdf-navegador').addEventListener('click', function() {
+    document.getElementById('btn-pdf-navegador')?.addEventListener('click', function() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'pt', 'a4');
         const element = document.querySelector('.pdf-outer'); // Captura el borde externo

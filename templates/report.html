@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=900, user-scalable=yes">
     <title>Reporte de Checklist</title>
     <style>
     body {
@@ -15,6 +15,7 @@
     }
     .pdf-container {
         max-width: 900px;
+        min-width: 900px;
         margin: 30px auto;
         padding: 40px 50px 32px 50px;
         background: #fff;
@@ -124,14 +125,12 @@
         padding-top: 6px;
         margin-left: 40px;
     }
-    @media (max-width: 700px) {
-        .header-flex .logo-header img { height: 44px; margin-left: 8px; }
-    }
-    @media print {
-        .logo-header { position: fixed; right: 40px; top: 24px; }
-    }
-    @page {
-        margin: 32px 32px 32px 32px;
+    /* Fuerzo modo escritorio en móvil: desactivo media queries que cambian el layout */
+    /* Elimino el media query que reduce el header en móvil */
+    /* El usuario verá el reporte igual que en escritorio, con scroll horizontal si es necesario */
+    html, body {
+        min-width: 900px;
+        overflow-x: auto;
     }
     </style>
 </head>

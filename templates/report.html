@@ -369,6 +369,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.7.0/jspdf.plugin.autotable.min.js"></script>
     <script>
+    // Variable checklistRows generada por Jinja2
+    var checklistRows = {{ checklist_rows | tojson | safe }};
     document.getElementById('btn-pdf-navegador').addEventListener('click', function() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('l', 'pt', 'a4');
@@ -414,13 +416,6 @@
         // Tabla de checklist diario
         doc.setFontSize(10);
         doc.setTextColor(0);
-        // Prepare checklist rows as a JavaScript array
-        var checklistRows = {{ [
-            [checklist_desc[key], value]
-            for key, value in checklist.items()
-            if key in checklist_desc and value in ['C','NC']
-        ] | tojson }};
-
         doc.autoTable({
             head: [['Descripción del Ítem', 'Respuesta']],
             body: checklistRows,

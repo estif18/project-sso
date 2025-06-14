@@ -429,7 +429,7 @@
         contentHeight = doc.autoTable.previous.finalY + 10;
 
         // Observaciones
-        var hasObservaciones = "{{ (checklist and checklist.get('observaciones')) and 'true' or 'false' }}";
+        var hasObservaciones = {{ (checklist and checklist.get('observaciones')) and 'true' or 'false' }};
         if (hasObservaciones) {
             doc.setFontSize(10);
             doc.setTextColor(0);
@@ -438,7 +438,7 @@
             doc.setFontSize(10);
             doc.setTextColor(0);
             // Use split to handle multi-line text
-            var observaciones = `{{ checklist['observaciones']|escapejs }}`;
+            var observaciones = {{ checklist['observaciones']|tojson|safe }};
             var lines = doc.splitTextToSize(observaciones, pdfWidth - margin * 2);
             doc.text(lines, margin, contentHeight);
             contentHeight += lines.length * 12;

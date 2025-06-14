@@ -389,7 +389,8 @@
         window.html2canvas(container, { scale: 2, useCORS: true, backgroundColor: '#fff' })
             .then(function(canvas) {
                 var imgData = canvas.toDataURL('image/png');
-                var pdf = new window.jspdf.jsPDF('l', 'pt', 'a4');
+                // Cambiar orientación a vertical (portrait)
+                var pdf = new window.jspdf.jsPDF('p', 'pt', 'a4');
                 var pdfWidth = pdf.internal.pageSize.getWidth();
                 var pdfHeight = pdf.internal.pageSize.getHeight();
                 var imgWidth = canvas.width;

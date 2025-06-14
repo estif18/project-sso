@@ -342,15 +342,18 @@
                 {% endfor %}
                 </tbody>
             </table>
-            <div class="footer" style="margin-top:18px;">
-                <b>Reporte generado el {{ created_at.strftime('%d/%m/%Y %H:%M:%S') }}</b><br>
-                <span style="font-size:12px;">Sistema de Gestión de Empresas - Área de Seguridad y Salud Ocupacional</span>
-            </div>
             <div class="firma">
                 <div class="firma-block">
-                    Firma del Conductor<br><br><br
+                    Firma del Conductor<br><br><br>
                 </div>
             </div>
+            {% if not pdf_mode %}
+            <div id="pdf-buttons" style="margin-top: 20px;">
+                <a href="{{ url_for('index') }}" style="background: linear-gradient(90deg, #3182ce 0%, #63b3ed 100%); color: #fff; padding: 8px 18px; border-radius: 6px; margin-right: 10px; text-decoration: none; font-weight: 600;">Volver al Formulario</a>
+                <a href="{{ url_for('all_reports') }}" style="background: linear-gradient(90deg, #3182ce 0%, #63b3ed 100%); color: #fff; padding: 8px 18px; border-radius: 6px; text-decoration: none; font-weight: 600;">Ver Todos los Reportes</a>
+                <button id="btn-pdf-navegador" style="background: linear-gradient(90deg, #f59e42 0%, #f6e05e 100%); color: #222; padding: 8px 18px; border-radius: 6px; border:none; font-weight: 600; margin-left: 10px; cursor:pointer;">Generar PDF</button>
+            </div>
+            {% endif %}
             <div class="page-separator" style="margin-top:24px;"></div>
         </div>
     </div>
@@ -360,6 +363,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
     document.getElementById('btn-pdf-navegador')?.addEventListener('click', function() {
+        const btns = document.getElementById('pdf-buttons');
+        if (btns) btns.style.display = 'none';
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'pt', 'a4');
         const element = document.querySelector('.pdf-outer'); // Captura el borde externo
@@ -381,6 +386,7 @@
                 doc.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
                 remainingHeight -= (pageHeight - margin * 2);
             }
+            if (btns) btns.style.display = '';
             doc.save('reporte_checklist.pdf');
         });
     });

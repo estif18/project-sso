@@ -370,32 +370,49 @@
     var checklistRows = {{ checklist_rows | tojson | safe }};
     var hasObservaciones = {{ _has_obs|tojson|safe }};
     var observaciones = {{ _obs|tojson|safe }};
+
     function exportPDFVisual() {
         var pdfButtons = document.getElementById('pdf-buttons');
         if (pdfButtons) pdfButtons.style.display = 'none';
         var container = document.querySelector('.pdf-container');
-        html2canvas(container, { scale: 2, useCORS: true, backgroundColor: '#fff' }).then(function(canvas) {
-            var imgData = canvas.toDataURL('image/png');
-            var pdf = new jsPDF('l', 'pt', 'a4');
-            var pdfWidth = pdf.internal.pageSize.getWidth();
-            var pdfHeight = pdf.internal.pageSize.getHeight();
-            var imgWidth = canvas.width;
-            var imgHeight = canvas.height;
-            var ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-            var finalWidth = imgWidth * ratio;
-            var finalHeight = imgHeight * ratio;
-            var x = (pdfWidth - finalWidth) / 2;
-            var y = (pdfHeight - finalHeight) / 2;
-            pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
-            pdf.save('reporte_checklist_diario.pdf');
+        if (!window.html2canvas || !window.jspdf) {
+            alert('No se han cargado las librerías necesarias para exportar PDF.');
             if (pdfButtons) pdfButtons.style.display = '';
-        });
+            return;
+        }
+        html2canvas(container, { scale: 2, useCORS: true, backgroundColor: '#fff' })
+            .then(function(canvas) {
+                var imgData = canvas.toDataURL('image/png');
+                var pdf = new window.jspdf.jsPDF('l', 'pt', 'a4');
+                var pdfWidth = pdf.internal.pageSize.getWidth();
+                var pdfHeight = pdf.internal.pageSize.getHeight();
+                var imgWidth = canvas.width;
+                var imgHeight = canvas.height;
+                var ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+                var finalWidth = imgWidth * ratio;
+                var finalHeight = imgHeight * ratio;
+                var x = (pdfWidth - finalWidth) / 2;
+                var y = (pdfHeight - finalHeight) / 2;
+                pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
+                pdf.save('reporte_checklist_diario.pdf');
+                if (pdfButtons) pdfButtons.style.display = '';
+            })
+            .catch(function(err) {
+                alert('Ocurrió un error al generar el PDF. Revisa la consola para más detalles.');
+                console.error('Error al generar PDF:', err);
+                if (pdfButtons) pdfButtons.style.display = '';
+            });
     }
-    document.getElementById('btn-pdf-navegador').addEventListener('click', function(e) {
-        e.preventDefault();
-        exportPDFVisual();
+    document.addEventListener('DOMContentLoaded', function() {
+        var btn = document.getElementById('btn-pdf-navegador');
+        if (btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                exportPDFVisual();
+            });
+        }
     });
-    </script>
-    {% endif %}
+</script>
+{% endif %}
 </body>
 </html>

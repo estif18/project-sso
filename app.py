@@ -748,7 +748,8 @@ def report(submission_id):
         nc_daily=nc_daily,
         nc_tools=nc_tools,
         diario_no_cumple=diario_no_cumple,
-        checklist_rows=checklist_rows
+        checklist_rows=checklist_rows,
+        device_info=platform.platform(),
     )
 
 @app.route('/all_reports', methods=['GET', 'POST'])

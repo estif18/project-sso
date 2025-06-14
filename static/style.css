@@ -164,22 +164,28 @@ a:hover {
 }
 
 /* Mejora de accesibilidad para botones de C, NC, NA en checklist */
-.checklist-btns label {
-    display: inline-flex;
+.checklist-btns {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
     align-items: center;
-    background: #f1f5f9;
-    border: 2px solid #3182ce;
+    gap: 0;
+}
+.checklist-btns label {
+    margin-right: 0;
+    margin-left: 0;
+    margin-bottom: 0;
     border-radius: 8px;
+    border: 2px solid #3182ce;
+    background: #f1f5f9;
     padding: 8px 18px;
-    margin-right: 18px;
     font-size: 1.15em;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.2s, border 0.2s;
 }
-.checklist-btns label:hover, .checklist-btns input[type="radio"]:focus + label {
-    background: #e3e6f3;
-    border-color: #1a237e;
+.checklist-btns label:not(:last-child) {
+    margin-right: 12px;
 }
 .checklist-btns input[type="radio"] {
     width: 22px;

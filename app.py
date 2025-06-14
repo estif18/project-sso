@@ -680,6 +680,66 @@ def report(submission_id):
                 resumen = 'No cumple'
                 break
     nc_daily, nc_tools = get_nc_items_with_description(daily_checklist, tools_check)
+
+    # --- Generar checklist_rows serializable para el PDF ---
+    checklist_desc = {
+        'item0': 'CHEQUEO EL STICKER SI LLEGA AL KILOMETRAJE DE MANTTO LLEVE AL TALLER',
+        'prox_mantto': 'PROX MANTTO',
+        'item1': 'CHEQUEE SI LA UNIDAD TIENE ALGÚN ROCE, ABOLLADURA, ETC.',
+        'item2': 'VERIFIQUE QUE NO EXISTAN FUGAS DE ACEITE, AGUA, COMBUSTIBLE*',
+        'item3': 'PURGAR EL AGUA DEL FILTRO DE PETRÓLEO*',
+        'item4': 'REVISE EL NIVEL DE ACEITE DE MOTOR*',
+        'item5': 'REVISE EL NIVEL DE ACEITE HIDRÁULICO',
+        'item6': 'REVISE EL NIVEL DE LÍQUIDO DE FRENO*',
+        'item7': 'REVISE EL NIVEL DE LÍQUIDO DE EMBRAGUE*',
+        'item8': 'REVISE EL NIVEL DE AGUA DEL LIMPIAPARABRISAS',
+        'item9': 'REVISE CONEXIONES DE BATERÍA Y NIVEL DE ELECTROLITO*',
+        'item10': 'REVISE TENSIÓN DE LAS FAJAS DE ALTERNADOR*',
+        'item11': 'VERIFIQUE EL AJUSTE DE TUERCAS DE LAS RUEDAS*',
+        'item12': 'REVISE ESPEJOS RETROVISORES *',
+        'item13': 'CINTURÓN DE SEGURIDAD *',
+        'item14': 'COMPROBAR ALARMA DE RETROCESO *',
+        'item15': 'COMPROBAR NIVEL DEL REFRIGERANTE',
+        'item16': 'TAPA DE TANQUE DE COMBUSTIBLE',
+        'item17': 'VERIFIQUE PROFUNDIDAD DE NEUMÁTICOS',
+        'item18': 'COMPUERTAS TRASERAS EN CASO DE FURGÓN *',
+        'item19': 'CABLE PARA PASAR CORRIENTE DE BATERÍA',
+        'item100': 'VERIFIQUE QUE NO EXISTAN FUGAS DE ACEITE, AGUA, COMBUSTIBLE O LIQUIDO DE FRENO QUE MOJE LOS NEUMÁTICOS*',
+        'item101': 'REVISE LUCES ( BAJA Y ALTA - RUTA ) *',
+        'item102': 'VERIFIQUE FUNCIONAMIENTO NORMAL DEL TABLERO DE INSTRUMENTOS',
+        'item103': 'NIVEL DE COMBUSTIBLE MAYOR DE 1/4 DE TANQUE',
+        'item104': 'COMPROBAR FUNCIONAMIENTO DE CLAXON *',
+        'item105': 'FRENO DE MANO Y PARQUEO *',
+        'item106': 'PRESIÓN DE ACEITE DE MOTOR',
+        'item107': 'CARGA DE ALTERNADOR',
+        'item108': 'TABLERO DE CONTROL',
+        'item200': 'NIVEL DE ACEITE DE TRANSMISIÓN Y HIDRÁULICO',
+        'item201': 'UÑAS Y CADENA DE LEVANTE',
+        'item202': 'BRAZO DE SOPORTE',
+        'item203': '---',
+        'item204': 'ESTADO DE RUEDA GUÍA Y SPROCKET',
+        'item205': 'ESTADO DE CONTROL DE MANDOS ',
+        'item300': 'ESTADO DE ROLA',
+        'item301': 'LAS GOMAS DE LA ROLA',
+        'item400': 'TOLDERA ',
+        'item401': 'CINTA REFLECTIVA VISIBLE',
+        'item402': 'GANCHOS DE COMPUERTA TRASERA',
+        'item403': 'TEMPLADORES DE LA COMPUERTA',
+        'item404': 'REVISIÓN DE LA TOLVA (BASE, PINES DE COMPUERTA)',
+        'item405': 'FUGAS DE ACEITE DE PISTÓN DE LEVANTE Y TANQUE HIDRÁULICO',
+        'item500': 'ACCESORIOS DE LA PLUMA Y PLATAFORMA',
+        'item501': 'ACCESORIOS DE IZAJE',
+        'item600': 'TANQUE - CONTOMETRO Y PISTOLA SURTIDORA AUTOMÁTICA',
+        'item601': 'BOMBA DE AGUA '
+    }
+    checklist_rows = []
+    if daily_checklist:
+        daily_dict = daily_checklist.to_dict()
+        for key, desc in checklist_desc.items():
+            value = daily_dict.get(key)
+            if value in ['C', 'NC']:
+                checklist_rows.append([desc, value if value is not None else ""])
+
     return render_template(
         'report.html',
         submission=submission,
@@ -696,7 +756,8 @@ def report(submission_id):
         grupos_no_cumple=grupos_no_cumple,
         nc_daily=nc_daily,
         nc_tools=nc_tools,
-        diario_no_cumple=diario_no_cumple
+        diario_no_cumple=diario_no_cumple,
+        checklist_rows=checklist_rows
     )
 
 @app.route('/all_reports', methods=['GET', 'POST'])
@@ -710,7 +771,7 @@ def all_reports():
     if selected_company:
         submissions_query = submissions_query.filter_by(company_id=selected_company)
     if selected_asset:
-        submissions_query = submissions_query.filter_by(asset_id=selected_asset)
+        submissions_query = submissions_query.filter_by(asset_id=selectedAsset)
     if selected_worker:
         submissions_query = submissions_query.filter_by(worker_id=selected_worker)
     submissions = submissions_query.all()

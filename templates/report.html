@@ -366,6 +366,9 @@
     {% set _has_obs = checklist and checklist.get('observaciones') %}
     {% set _obs = checklist['observaciones'] if _has_obs else '' %}
     {% if not pdf_mode %}
+    <!-- Cargar librerías ANTES del script principal -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script type="text/javascript">
     var checklistRows = {{ checklist_rows | tojson | safe }};
     var hasObservaciones = {{ _has_obs|tojson|safe }};
@@ -375,12 +378,15 @@
         var pdfButtons = document.getElementById('pdf-buttons');
         if (pdfButtons) pdfButtons.style.display = 'none';
         var container = document.querySelector('.pdf-container');
-        if (!window.html2canvas || !window.jspdf) {
+        // Mejor detección de librerías
+        var jsPDFReady = window.jspdf && window.jspdf.jsPDF;
+        var html2canvasReady = typeof window.html2canvas === 'function';
+        if (!jsPDFReady || !html2canvasReady) {
             alert('No se han cargado las librerías necesarias para exportar PDF.');
             if (pdfButtons) pdfButtons.style.display = '';
             return;
         }
-        html2canvas(container, { scale: 2, useCORS: true, backgroundColor: '#fff' })
+        window.html2canvas(container, { scale: 2, useCORS: true, backgroundColor: '#fff' })
             .then(function(canvas) {
                 var imgData = canvas.toDataURL('image/png');
                 var pdf = new window.jspdf.jsPDF('l', 'pt', 'a4');
@@ -412,7 +418,7 @@
             });
         }
     });
-</script>
-{% endif %}
+    </script>
+    {% endif %}
 </body>
 </html>

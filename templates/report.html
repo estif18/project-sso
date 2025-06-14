@@ -185,21 +185,27 @@
                 </div>
             </div>
             <table style="margin-bottom:10px;">
-                <tr><th style="width:180px;">Código</th><td>SGI-MAN-TA-F1</td><th style="width:120px;">Versión</th><td>03</td><th style="width:120px;">Página</th><td>1</td></tr>
-                <tr><th>Fecha de Vigencia</th><td>31/12/2024</td><th colspan="4" style="text-align:right;">U.E.A. BERLIN</th></tr>
+                <tr>
+                    <th style="width:350px; text-align:left; font-size:1.1em;" colspan="2">CIA Minera Santa Luisa S.A</th>
+                    <th style="width:120px;">Versión:</th>
+                    <td style="width:80px;">03</td>
+                    <th style="width:180px; text-align:center;" rowspan="2">U.E.A. BERLIN</th>
+                </tr>
+                <tr>
+                    <th style="width:120px;">Código</th>
+                    <td style="width:120px;">SGI-MAN-TA-F1</td>
+                    <th style="width:120px;">Página:</th>
+                    <td style="width:80px;">1</td>
+                </tr>
+                <tr>
+                    <th style="width:120px;">Fecha de Vigencia</th>
+                    <td style="width:120px;">31/12/2024</td>
+                    <td colspan="3"></td>
+                </tr>
             </table>
             <table style="margin-bottom:10px;">
                 <tr><th style="width:180px;">CÓDIGO DE EQUIPO</th><td>{{ asset.code }}</td><th>Kilometraje u Horómetro</th><td colspan="3">Inicial: ________  Final: ________</td></tr>
                 <tr><th>DESCRIPCIÓN DE EQUIPO</th><td>{{ asset.type }}</td><th>Conductor</th><td>{{ worker.name }}</td><th>Fecha</th><td>{{ created_at.strftime('%d/%m/%Y') }}</td></tr>
-            </table>
-            <h2 style="font-size:1.05em; color:#1a237e; margin-bottom:6px; margin-top:12px;">1. Datos Generales del Registro</h2>
-            <table style="margin-bottom:10px;">
-                <tr><th>ID de Registro</th><td>{{ submission.id }}</td></tr>
-                <tr><th>Empresa</th><td>{{ company.name }}</td></tr>
-                <tr><th>Trabajador Responsable</th><td>{{ worker.name }}</td></tr>
-                <tr><th>Equipo Inspeccionado</th><td>{{ asset.type }}</td></tr>
-                <tr><th>Placa/Código</th><td>{{ asset.code }}</td></tr>
-                <tr><th>Fecha y Hora de Inspección</th><td>{{ created_at.strftime('%d/%m/%Y %H:%M:%S') }} (GMT-5 Perú)</td></tr>
             </table>
             {% set checklist = daily_checklist.to_dict() if daily_checklist else {} %}
             {% set tools_check = tools_check.to_dict() if tools_check else {} %}
@@ -361,34 +367,103 @@
     <!-- jsPDF y html2canvas para exportar PDF en el navegador -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.7.0/jspdf.plugin.autotable.min.js"></script>
     <script>
-    document.getElementById('btn-pdf-navegador')?.addEventListener('click', function() {
-        const btns = document.getElementById('pdf-buttons');
-        if (btns) btns.style.display = 'none';
+    document.getElementById('btn-pdf-navegador').addEventListener('click', function() {
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('p', 'pt', 'a4');
-        const element = document.querySelector('.pdf-outer'); // Captura el borde externo
-        html2canvas(element, { scale: 2, backgroundColor: '#fff' }).then(canvas => {
-            const imgData = canvas.toDataURL('image/png');
-            const pageWidth = doc.internal.pageSize.getWidth();
-            const pageHeight = doc.internal.pageSize.getHeight();
-            // Calcula el tamaño de la imagen para dejar márgenes tipo Word
-            const margin = 32; // margen blanco en PDF
-            const imgWidth = pageWidth - margin * 2;
-            const imgHeight = canvas.height * imgWidth / canvas.width;
-            let position = margin;
-            doc.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
-            // Si el contenido es más largo que una página, añade páginas
-            let remainingHeight = imgHeight;
-            while (remainingHeight > pageHeight - margin * 2) {
-                position -= (pageHeight - margin * 2);
-                doc.addPage();
-                doc.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
-                remainingHeight -= (pageHeight - margin * 2);
-            }
-            if (btns) btns.style.display = '';
-            doc.save('reporte_checklist.pdf');
+        const doc = new jsPDF('l', 'pt', 'a4');
+        const pdfWidth = doc.internal.pageSize.getWidth();
+        const pdfHeight = doc.internal.pageSize.getHeight();
+        const margin = 40;
+        const headerHeight = 60;
+        const footerHeight = 30;
+        let contentHeight = 0;
+
+        doc.setFontSize(12);
+        doc.text('Reporte de Checklist', margin, margin + 20);
+
+        // Cabecera
+        doc.setFillColor(227, 230, 243);
+        doc.rect(margin, margin + 30, pdfWidth - margin * 2, 20, 'F');
+        doc.setTextColor(26, 35, 126);
+        doc.setFontSize(10);
+        doc.text('CIA Minera Santa Luisa S.A', margin + 10, margin + 45);
+        doc.text('Versión:', pdfWidth - margin - 80, margin + 45, { align: 'right' });
+        doc.text('Página:', pdfWidth - margin - 80, margin + 60, { align: 'right' });
+        doc.text('Fecha de Vigencia', margin + 10, margin + 60);
+
+        // Datos de la empresa
+        doc.setFontSize(10);
+        doc.setTextColor(0);
+        doc.text('CIA Minera Santa Luisa S.A', margin + 10, margin + 80);
+        doc.text('RUC: 20512345678', margin + 10, margin + 95);
+        doc.text('Dirección: Av. Siempre Viva 123', margin + 10, margin + 110);
+        doc.text('Teléfono: (01) 234-5678', margin + 10, margin + 125);
+        doc.text('Correo: contacto@minerasantaluisas.com', margin + 10, margin + 140);
+
+        // Salto de página
+        doc.addPage();
+        contentHeight += margin + 160;
+
+        // Título sección
+        doc.setFontSize(14);
+        doc.setTextColor(26, 35, 126);
+        doc.text('Reporte de Checklist Diario', margin, contentHeight);
+        contentHeight += 20;
+
+        // Tabla de checklist diario
+        doc.setFontSize(10);
+        doc.setTextColor(0);
+        // Prepare checklist rows as a JavaScript array
+        var checklistRows = {{ [
+            [checklist_desc[key], value]
+            for key, value in checklist.items()
+            if key in checklist_desc and value in ['C','NC']
+        ] | tojson }};
+
+        doc.autoTable({
+            head: [['Descripción del Ítem', 'Respuesta']],
+            body: checklistRows,
+            startY: contentHeight,
+            margin: { top: 10, right: 10, bottom: 0, left: 10 },
+            styles: { cellPadding: 2, fontSize: 10 },
+            headStyles: { fillColor: [227, 230, 243], textColor: [26, 35, 126], fontSize: 10, fontWeight: 'bold' },
+            alternateRowStyles: { fillColor: [255, 255, 255] },
+            theme: 'grid',
         });
+        contentHeight = doc.autoTable.previous.finalY + 10;
+
+        // Observaciones
+        var hasObservaciones = "{{ (checklist and checklist.get('observaciones')) and 'true' or 'false' }}";
+        if (hasObservaciones) {
+            doc.setFontSize(10);
+            doc.setTextColor(0);
+            doc.text('Observaciones adicionales:', margin, contentHeight);
+            contentHeight += 10;
+            doc.setFontSize(10);
+            doc.setTextColor(0);
+            // Use split to handle multi-line text
+            var observaciones = `{{ checklist['observaciones']|escapejs }}`;
+            var lines = doc.splitTextToSize(observaciones, pdfWidth - margin * 2);
+            doc.text(lines, margin, contentHeight);
+            contentHeight += lines.length * 12;
+        }
+
+        // Firma
+        doc.setFontSize(10);
+        doc.setTextColor(0);
+        doc.text('Firma del Conductor', margin, contentHeight);
+        contentHeight += 20;
+        doc.line(margin, contentHeight, pdfWidth - margin, contentHeight);
+        contentHeight += 10;
+
+        // Footer
+        doc.setFontSize(8);
+        doc.setTextColor(128);
+        doc.text('Página ' + doc.internal.getNumberOfPages(), margin, pdfHeight - margin - footerHeight + 10);
+        doc.text('Reporte generado por Minera Santa Luisa S.A', margin, pdfHeight - margin - footerHeight + 20);
+
+        doc.save('reporte_checklist_diario.pdf');
     });
     </script>
     {% endif %}

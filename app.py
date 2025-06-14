@@ -513,7 +513,6 @@ def checklist(submission_id):
                 resumen = 'No cumple'
                 grupos_no_cumple.append(nombre)
         db.session.commit()
-        flash(f'Checklist guardado correctamente. Estado general: {resumen}', 'success')
         return redirect(url_for('tools_check', submission_id=submission.id))
     return render_template(plantilla, submission=submission, company=company, worker=worker, asset=asset)
 
@@ -591,7 +590,6 @@ def tools_check(submission_id):
             gc = GroupCompliance(submission_id=submission.id, group_name=nombre, compliance_status=estado)
             db.session.add(gc)
         db.session.commit()
-        flash('Chequeo de herramientas guardado correctamente.', 'success')
         return redirect(url_for('report', submission_id=submission.id))
     return render_template('tools_check.html', submission=submission, company=company, worker=worker, asset=asset)
 

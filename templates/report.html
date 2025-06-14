@@ -422,11 +422,11 @@
                 </div>
             </div>
             {% if not pdf_mode %}
-            <script type="text/javascript">
+            <script type="application/javascript">
             //<![CDATA[
-            var checklistRows = JSON.parse('{{ checklist_rows|tojson|safe|escapejs }}');
-            var hasObservaciones = JSON.parse('{{ _has_obs|tojson|safe|escapejs }}');
-            var observaciones = JSON.parse('{{ _obs|tojson|safe|escapejs }}');
+            var checklistRows = {{ checklist_rows|tojson|safe }};
+            var hasObservaciones = {{ _has_obs|tojson|safe }};
+            var observaciones = {{ _obs|tojson|safe }};
             //]]>
             </script>
             <div id="pdf-buttons" style="margin-top: 20px;">

@@ -422,10 +422,13 @@
                 <div class="footer" style="width:100%; text-align:right; color:#444; font-size:12px; margin-top:24px; border-top:1px solid #1a237e; padding-top:8px;">
                     Reporte generado el {{ created_at.strftime('%d/%m/%Y %H:%M') }}<br>
                     Generado por: Área de Seguridad y Salud Ocupacional<br>
-                    {% if device_info %}Dispositivo: {{ device_info }}{% endif %}
+                    Dispositivo: <span id="device-info">Detectando...</span>
                 </div>
             </div>
             {% if not pdf_mode %}
+            <!-- Cargar jsPDF y html2canvas desde static/ para máxima compatibilidad móvil -->
+            <script src="{{ url_for('static', filename='jspdf.umd.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='html2canvas.min.js') }}"></script>
             <script type="application/javascript">
             //<![CDATA[
             var checklistRows = {{ checklist_rows|tojson|safe }};
@@ -486,6 +489,21 @@
                 e.preventDefault();
                 exportPDFVisual();
             });
+        }
+        // Mostrar información del dispositivo en el pie de página
+        var deviceInfoSpan = document.getElementById('device-info');
+        if (deviceInfoSpan) {
+            var ua = navigator.userAgent;
+            var platform = navigator.platform;
+            var device = '';
+            if (/android/i.test(ua)) device = 'Android';
+            else if (/iphone|ipad|ipod/i.test(ua)) device = 'iOS';
+            else if (/windows phone/i.test(ua)) device = 'Windows Phone';
+            else if (/windows/i.test(platform)) device = 'Windows';
+            else if (/mac/i.test(platform)) device = 'MacOS';
+            else if (/linux/i.test(platform)) device = 'Linux';
+            else device = 'Otro';
+            deviceInfoSpan.textContent = device + ' (' + ua + ')';
         }
     });
     </script>

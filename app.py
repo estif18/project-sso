@@ -731,6 +731,16 @@ def report(submission_id):
             if value in ['C', 'NC']:
                 checklist_rows.append([desc, value if value is not None else ""])
 
+    # --- Asegurar serializabilidad para JS en template ---
+    if checklist_rows is None:
+        checklist_rows = []
+    _has_obs = False
+    _obs = ''
+    if daily_checklist:
+        daily_dict = daily_checklist.to_dict()
+        _has_obs = 'observaciones' in daily_dict and bool(daily_dict['observaciones'])
+        _obs = daily_dict.get('observaciones', '')
+
     return render_template(
         'report.html',
         submission=submission,
@@ -750,6 +760,8 @@ def report(submission_id):
         diario_no_cumple=diario_no_cumple,
         checklist_rows=checklist_rows,
         device_info=platform.platform(),
+        _has_obs=_has_obs,
+        _obs=_obs,
     )
 
 @app.route('/all_reports', methods=['GET', 'POST'])

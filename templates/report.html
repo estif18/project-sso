@@ -337,16 +337,20 @@
                 </tbody>
             </table>
             {% endif %}
-            {% if checklist and checklist.get('observaciones') %}
-            <div class="observaciones">
-                <h3>4. Observaciones adicionales</h3>
-                <p>{{ checklist['observaciones'] }}</p>
-            </div>
-            {% endif %}
-            {% if tools_check and tools_check.get('observaciones') %}
-            <div class="observaciones">
-                <h3>5. Observaciones adicionales - Herramientas y Equipos de Seguridad</h3>
-                <p>{{ tools_check['observaciones'] }}</p>
+            {% if checklist and checklist.get('observaciones') or (tools_check and tools_check.get('observaciones')) %}
+            <div class="observaciones-flex" style="display:flex; gap:24px; align-items:flex-start; margin-bottom:14px;">
+                {% if checklist and checklist.get('observaciones') %}
+                <div class="observaciones" style="flex:1;">
+                    <h3>4. Observaciones adicionales</h3>
+                    <p>{{ checklist['observaciones'] }}</p>
+                </div>
+                {% endif %}
+                {% if tools_check and tools_check.get('observaciones') %}
+                <div class="observaciones" style="flex:1;">
+                    <h3>5. Observaciones adicionales - Herramientas y Equipos de Seguridad</h3>
+                    <p>{{ tools_check['observaciones'] }}</p>
+                </div>
+                {% endif %}
             </div>
             {% endif %}
             {% if (checklist and checklist.get('foto')) or (tools_check and tools_check.get('foto')) %}
@@ -424,13 +428,9 @@
             {% if not pdf_mode %}
             <script type="application/javascript">
             //<![CDATA[
-            var checklistRows = [];
-            var hasObservaciones = false;
-            var observaciones = '';
-            // Los siguientes bloques solo se procesan por Jinja2 en el backend, no en el navegador
-            {% if checklist_rows is defined %}checklistRows = {{ checklist_rows|tojson|safe }};{% endif %}
-            {% if _has_obs is defined %}hasObservaciones = {{ _has_obs|tojson|safe }};{% endif %}
-            {% if _obs is defined %}observaciones = {{ _obs|tojson|safe }};{% endif %}
+            var checklistRows = {{ checklist_rows|tojson|safe }};
+            var hasObservaciones = {{ _has_obs|tojson|safe }};
+            var observaciones = {{ _obs|tojson|safe }};
             //]]>
             </script>
             <div id="pdf-buttons" style="margin-top: 20px;">

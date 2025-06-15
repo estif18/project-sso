@@ -24,12 +24,26 @@
     <ul class="flashes">{% for category, message in messages %}<li class="flash-{{ category }}">{{ message }}</li>{% endfor %}</ul>
   {% endif %}
 {% endwith %}
-<form method="POST" enctype="multipart/form-data" style="max-width:900px;margin:auto;">
+<form method="POST" enctype="multipart/form-data" style="max-width:950px;margin:auto;">
     <table class="checklist-table">
-        <tbody>
+        <thead>
             <tr><th colspan="5" class="checklist-section checklist-section-title">GENERAL (EQUIPO APAGADO)</th></tr>
-            <tr><td class="checklist-label">PROX MANTTO:</td><td colspan="4"><input type="date" name="prox_mantto" required></td></tr>
-            <tr><td class="checklist-label">CHEQUEO EL STICKER SI LLEGA AL KILOMETRAJE DE MANTTO LLEVE AL TALLER*</td><td colspan="4"><div class="checklist-btns"><label><input type="radio" name="item0" value="C" required> C</label><label><input type="radio" name="item0" value="NC"> NC</label><label><input type="radio" name="item0" value="NA"> NA</label></div></td></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="checklist-label">PROX MANTTO:</td>
+                <td colspan="4"><input type="date" name="prox_mantto" required style="width:170px;"></td>
+            </tr>
+            <tr>
+                <td class="checklist-label">CHEQUEO EL STICKER SI LLEGA AL KILOMETRAJE DE MANTTO LLEVE AL TALLER*</td>
+                <td colspan="4">
+                    <div class="checklist-btns">
+                        <label><input type="radio" name="item0" value="C" required> C</label>
+                        <label><input type="radio" name="item0" value="NC"> NC</label>
+                        <label><input type="radio" name="item0" value="NA"> NA</label>
+                    </div>
+                </td>
+            </tr>
             {% set items1 = [
                 'CHEQUEE SI LA UNIDAD TIENE ALGÚN ROCE, ABOLLADURA, ETC.',
                 'VERIFIQUE QUE NO EXISTAN FUGAS DE ACEITE, AGUA, COMBUSTIBLE*',

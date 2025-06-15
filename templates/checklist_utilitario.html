@@ -27,7 +27,7 @@
 <form method="POST" enctype="multipart/form-data" style="max-width:950px;margin:auto;">
     <table class="checklist-table">
         <thead>
-            <tr><th colspan="5" class="checklist-section checklist-section-title">GENERAL (EQUIPO APAGADO)</th></tr>
+            <tr><th colspan="5" class="checklist-section-title">GENERAL (EQUIPO APAGADO)</th></tr>
         </thead>
         <tbody>
             <tr>
@@ -68,7 +68,7 @@
             {% for item in items1 %}
             <tr><td class="checklist-label">{{ item }}</td><td class="checklist-btns" colspan="4"><label><input type="radio" name="item{{ loop.index }}" value="C" required> C</label><label><input type="radio" name="item{{ loop.index }}" value="NC"> NC</label><label><input type="radio" name="item{{ loop.index }}" value="NA"> NA</label></td></tr>
             {% endfor %}
-            <tr><th colspan="5" class="checklist-section checklist-section-title">GENERAL (MOTOR ENCENDIDO)</th></tr>
+            <tr><th colspan="5" class="checklist-section-title">GENERAL (MOTOR ENCENDIDO)</th></tr>
             {% set items2 = [
                 'VERIFIQUE QUE NO EXISTAN FUGAS DE ACEITE, AGUA, COMBUSTIBLE O LIQUIDO DE FRENO QUE MOJE LOS NEUMÁTICOS*',
                 'REVISE LUCES ( BAJA Y ALTA - RUTA ) *',
@@ -83,7 +83,7 @@
             {% for item in items2 %}
             <tr><td class="checklist-label">{{ item }}</td><td class="checklist-btns" colspan="4"><label><input type="radio" name="item{{ 100+loop.index }}" value="C" required> C</label><label><input type="radio" name="item{{ 100+loop.index }}" value="NC"> NC</label><label><input type="radio" name="item{{ 100+loop.index }}" value="NA"> NA</label></td></tr>
             {% endfor %}
-            <tr><th colspan="5" class="checklist-section checklist-section-title">CISTERNA Y UTILITARIO</th></tr>
+            <tr><th colspan="5" class="checklist-section-title">CISTERNA Y UTILITARIO</th></tr>
             {% set items7 = [
                 'TANQUE - CONTOMETRO Y PISTOLA SURTIDORA AUTOMÁTICA',
                 'BOMBA DE AGUA '

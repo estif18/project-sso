@@ -233,7 +233,7 @@
                     <td>{{ codigo_formato or 'SGI-MAN-TA-F1' }}</td>
                     <th style="width:120px;">VERSIÓN:</th>
                     <td style="width:80px;">03</td>
-                    <th style="width:180px; text-align:center;">U.E.A. BERLIN</th>
+                    <th style="width:180px; text-align:center;" rowspan="2" valign="middle">U.E.A. BERLIN</th>
                 </tr>
                 <tr>
                     <th style="width:180px;">FECHA DE VIGENCIA</th>
@@ -252,7 +252,7 @@
             <h3 class="section-title" style="margin-top:18px;">2. Checklist Diario de Operación</h3>
             <table>
                 <thead>
-                    <tr><th colspan="2" style="text-align:left; background:#e3e6f3; color:#1a237e;">General (Equipo Apagado)</th></tr>
+                    <tr><th colspan="2" class="checklist-section-title" style="text-align:left;">General (Equipo Apagado)</th></tr>
                     <tr><th style="width:70%;">Descripción del Ítem</th><th style="text-align:center;">Respuesta</th></tr>
                 </thead>
                 <tbody>
@@ -263,7 +263,11 @@
                     {% if key in checklist_desc and checklist.get(key) in ['C','NC'] %}
                         <tr>
                             <td>{{ checklist_desc[key] }}</td>
-                            <td style="text-align:center;">{{ checklist[key] }}</td>
+                            <td style="text-align:center;">
+                              <span class="checklist-btns">
+                                {{ checklist[key] }}
+                              </span>
+                            </td>
                         </tr>
                         {% if checklist[key] == 'NC' %}
                             {% set nc_daily = nc_daily + [checklist_desc[key]] %}
@@ -274,7 +278,7 @@
             </table>
             <table>
                 <thead>
-                    <tr><th colspan="2" style="text-align:left; background:#e3e6f3; color:#1a237e;">General (Motor Encendido)</th></tr>
+                    <tr><th colspan="2" class="checklist-section-title" style="text-align:left;">General (Motor Encendido)</th></tr>
                     <tr><th style="width:70%;">Descripción del Ítem</th><th style="text-align:center;">Respuesta</th></tr>
                 </thead>
                 <tbody>
@@ -283,7 +287,11 @@
                     {% if key in checklist_desc and checklist.get(key) in ['C','NC'] %}
                     <tr>
                         <td>{{ checklist_desc[key] }}</td>
-                        <td style="text-align:center;">{{ checklist[key] }}</td>
+                        <td style="text-align:center;">
+                          <span class="checklist-btns">
+                            {{ checklist[key] }}
+                          </span>
+                        </td>
                     </tr>
                     {% endif %}
                 {% endfor %}

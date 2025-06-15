@@ -450,8 +450,8 @@
         var pdfButtons = document.getElementById('pdf-buttons');
         if (pdfButtons) pdfButtons.style.display = 'none';
         var container = document.querySelector('.pdf-container');
-        // Mejor detección de librerías
-        var jsPDFReady = window.jspdf && window.jspdf.jsPDF;
+        // Mejor detección de librerías compatible con jsPDF UMD
+        var jsPDFReady = window.jspdf && (window.jspdf.jsPDF || window.jspdf.default);
         var html2canvasReady = typeof window.html2canvas === 'function';
         if (!jsPDFReady || !html2canvasReady) {
             alert('No se han cargado las librerías necesarias para exportar PDF.');
@@ -462,7 +462,8 @@
             .then(function(canvas) {
                 var imgData = canvas.toDataURL('image/png');
                 // Cambiar orientación a vertical (portrait)
-                var pdf = new window.jspdf.jsPDF('p', 'pt', 'a4');
+                var PDFClass = window.jspdf.jsPDF || window.jspdf.default;
+                var pdf = new PDFClass('p', 'pt', 'a4');
                 var pdfWidth = pdf.internal.pageSize.getWidth();
                 var pdfHeight = pdf.internal.pageSize.getHeight();
                 var imgWidth = canvas.width;

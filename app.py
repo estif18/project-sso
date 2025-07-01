@@ -322,42 +322,23 @@ def checklist(submission_id):
     if request.method == 'POST':
         checklist = dict(request.form)
         app.logger.info(f"Checklist POST recibido: {checklist}")
-        # DEBUG: Mostrar en consola los datos recibidos
-        print('--- CHECKLIST SUBMIT DEBUG ---')
-        print('Checklist recibido:', checklist)
-        print('Campos requeridos:')
-        for i in range(0, 20):
-            print(f'item{i}:', checklist.get(f'item{i}'))
-        for i in range(1, 10):
-            print(f'item{100+i}:', checklist.get(f'item{100+i}'))
-        for i in range(1, 7):
-            print(f'item{200+i}:', checklist.get(f'item{200+i}'))
-        for i in range(1, 3):
-            print(f'item{300+i}:', checklist.get(f'item{300+i}'))
-        for i in range(1, 7):
-            print(f'item{400+i}:', checklist.get(f'item{400+i}'))
-        for i in range(1, 3):
-            print(f'item{500+i}:', checklist.get(f'item{500+i}'))
-        for i in range(1, 3):
-            print(f'item{600+i}:', checklist.get(f'item{600+i}'))
-        # Validar que todos los campos requeridos estén presentes (ejemplo para los primeros 20)
-        missing = []
-        for i in range(0, 20):
-            if f'item{i}' not in checklist or checklist.get(f'item{i}') in (None, '', 'None'):
-                missing.append(f'item{i}')
-        if missing:
-            flash(f'Faltan respuestas en: {", ".join(missing)}. Revisa el autocompletado de NA.', 'error')
-            print('FALTAN CAMPOS:', missing)
-            return render_template(plantilla, submission=submission, company=company, worker=worker, asset=asset)
-        # --- VALIDACIÓN DE TODOS LOS CAMPOS REQUERIDOS SEGÚN EL TIPO DE EQUIPO ---
-        # Determinar los grupos relevantes para el equipo actual
+        # --- AUTOCOMPLETAR TODOS LOS CAMPOS REQUERIDOS SEGÚN EL TIPO DE EQUIPO CON 'NA' SI FALTAN O ESTÁN VACÍOS ---
         tipo_equipo = normalize_equipo(asset.type) if asset and asset.type else ''
         grupos_relevantes = grupos_por_equipo.get(tipo_equipo, [])
-        # Obtener todos los campos requeridos para este equipo
         requeridos = set()
         for grupo in grupos_relevantes:
             requeridos.update(grupos_items[grupo])
-        # Validar que todos los campos requeridos estén presentes y respondidos
+        # Autocompletar con 'NA' los campos requeridos que falten o estén vacíos
+        for key in requeridos:
+            if key not in checklist or checklist.get(key) in (None, '', 'None'):
+                checklist[key] = 'NA'
+        # DEBUG: Mostrar en consola los datos recibidos y los requeridos
+        print('--- CHECKLIST SUBMIT DEBUG ---')
+        print('Checklist recibido:', checklist)
+        print('Campos requeridos:')
+        for key in sorted(requeridos):
+            print(f'{key}:', checklist.get(key))
+        # Validar que todos los campos requeridos estén presentes y respondidos (debería cumplirse tras autocompletar)
         missing = []
         for key in requeridos:
             if key not in checklist or checklist.get(key) in (None, '', 'None'):
@@ -537,6 +518,35 @@ def tools_check(submission_id):
     if request.method == 'POST':
         tools_check = dict(request.form)
         app.logger.info(f"ToolsCheck POST recibido: {tools_check}")
+
+        # --- AUTOCOMPLETAR TODOS LOS CAMPOS REQUERIDOS CON 'NA' SI FALTAN O ESTÁN VACÍOS ---
+        requeridos = [
+            f'herr_item{i}' for i in range(1, 9)
+        ] + [
+            'kit_panos','kit_pico','kit_lampa','kit_costales','kit_salchicha','kit_bandeja','kit_tacos','kit_trajes','kit_guantes',
+            'otros_soat','otros_propiedad','otros_circulacion','otros_licencia'
+        ]
+        for key in requeridos:
+            if key not in tools_check or tools_check.get(key) in (None, '', 'None'):
+                tools_check[key] = 'NA'
+
+        # DEBUG: Mostrar en consola los datos recibidos y los requeridos
+        print('--- TOOLS_CHECK SUBMIT DEBUG ---')
+        print('ToolsCheck recibido:', tools_check)
+        print('Campos requeridos:')
+        for key in requeridos:
+            print(f'{key}:', tools_check.get(key))
+
+        # Validar que todos los campos requeridos estén presentes y respondidos (debería cumplirse tras autocompletar)
+        missing = []
+        for key in requeridos:
+            if key not in tools_check or tools_check.get(key) in (None, '', 'None'):
+                missing.append(key)
+        if missing:
+            flash(f'Faltan respuestas en: {", ".join(missing)}. Revisa el autocompletado de NA.', 'error')
+            print('FALTAN CAMPOS:', missing)
+            return render_template('tools_check.html', submission=submission, company=company, worker=worker, asset=asset)
+
         # Guardar observaciones
         observaciones = request.form.get('observaciones', '')
         # Guardar foto si se adjunta
@@ -550,6 +560,7 @@ def tools_check(submission_id):
                 corregir_orientacion_imagen(filepath)
             else:
                 flash('Formato de imagen no permitido.', 'error')
+
         # Crear registro en ToolsCheck
         def parse_date_field(val):
             if val in (None, '', 'None'):
@@ -560,29 +571,29 @@ def tools_check(submission_id):
                 return None
         tools = ToolsCheck(
             submission_id=submission.id,
-            herr_item1=request.form.get('herr_item1'),
-            herr_item2=request.form.get('herr_item2'),
-            herr_item3=request.form.get('herr_item3'),
+            herr_item1=tools_check.get('herr_item1'),
+            herr_item2=tools_check.get('herr_item2'),
+            herr_item3=tools_check.get('herr_item3'),
             herr_extintor_fecha=parse_date_field(request.form.get('herr_extintor_fecha')),
-            herr_item4=request.form.get('herr_item4'),
-            herr_item5=request.form.get('herr_item5'),
-            herr_item6=request.form.get('herr_item6'),
-            herr_item7=request.form.get('herr_item7'),
-            herr_item8=request.form.get('herr_item8'),
-            kit_panos=request.form.get('kit_panos'),
-            kit_pico=request.form.get('kit_pico'),
-            kit_lampa=request.form.get('kit_lampa'),
-            kit_costales=request.form.get('kit_costales'),
-            kit_salchicha=request.form.get('kit_salchicha'),
-            kit_bandeja=request.form.get('kit_bandeja'),
-            kit_tacos=request.form.get('kit_tacos'),
-            kit_trajes=request.form.get('kit_trajes'),
-            kit_guantes=request.form.get('kit_guantes'),
-            otros_soat=request.form.get('otros_soat'),
+            herr_item4=tools_check.get('herr_item4'),
+            herr_item5=tools_check.get('herr_item5'),
+            herr_item6=tools_check.get('herr_item6'),
+            herr_item7=tools_check.get('herr_item7'),
+            herr_item8=tools_check.get('herr_item8'),
+            kit_panos=tools_check.get('kit_panos'),
+            kit_pico=tools_check.get('kit_pico'),
+            kit_lampa=tools_check.get('kit_lampa'),
+            kit_costales=tools_check.get('kit_costales'),
+            kit_salchicha=tools_check.get('kit_salchicha'),
+            kit_bandeja=tools_check.get('kit_bandeja'),
+            kit_tacos=tools_check.get('kit_tacos'),
+            kit_trajes=tools_check.get('kit_trajes'),
+            kit_guantes=tools_check.get('kit_guantes'),
+            otros_soat=tools_check.get('otros_soat'),
             otros_soat_fecha=parse_date_field(request.form.get('otros_soat_fecha')),
-            otros_propiedad=request.form.get('otros_propiedad'),
-            otros_circulacion=request.form.get('otros_circulacion'),
-            otros_licencia=request.form.get('otros_licencia'),
+            otros_propiedad=tools_check.get('otros_propiedad'),
+            otros_circulacion=tools_check.get('otros_circulacion'),
+            otros_licencia=tools_check.get('otros_licencia'),
             observaciones=observaciones,
             foto=foto_filename
         )

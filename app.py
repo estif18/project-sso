@@ -1,21 +1,16 @@
-@app.route('/health')
-def health():
-    """Health check endpoint for Azure App Service or load balancer probes."""
-    return 'ok', 200
 from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory, make_response
 from flask_sqlalchemy import SQLAlchemy
-import json # Added
+import json
 from datetime import datetime
-import pytz # Added
-import os # Added
+import pytz
+import os
 from werkzeug.utils import secure_filename
 from sqlalchemy import Enum as SqlEnum, text
-
 from PIL import Image, ExifTags
-
-import mysql.connector # Added
+import mysql.connector
 import unicodedata
 import logging
+import sys
 import sys
 
 def test_mysql_connector():
@@ -35,6 +30,12 @@ def test_mysql_connector():
         print("MySQL direct connection failed:", e)
 
 app = Flask(__name__)
+
+# Health check endpoint (debe ir después de crear 'app')
+@app.route('/health')
+def health():
+    """Health check endpoint for Azure App Service or load balancer probes."""
+    return 'ok', 200
 app.config['SQLALCHEMY_DATABASE_URI'] = (
     'mysql+pymysql://ADmin296:prac_seg296@gestion-sso.mysql.database.azure.com/gestion_empresas'
     '?charset=utf8mb4'

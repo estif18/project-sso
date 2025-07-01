@@ -104,6 +104,27 @@
     </style>
 </head>
 <body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div style="max-width:500px;margin:20px auto 0 auto;">
+          {% for category, message in messages %}
+            {% if category == 'error' %}
+              <div style="padding:12px 18px;margin-bottom:10px;border-radius:6px;font-weight:600;background:#ffe5e5;color:#b91c1c;border:1px solid #fca5a5;">
+                {{ message }}
+              </div>
+            {% elif category == 'success' %}
+              <div style="padding:12px 18px;margin-bottom:10px;border-radius:6px;font-weight:600;background:#e6ffed;color:#166534;border:1px solid #6ee7b7;">
+                {{ message }}
+              </div>
+            {% else %}
+              <div style="padding:12px 18px;margin-bottom:10px;border-radius:6px;font-weight:600;background:#f1f5f9;color:#334155;border:1px solid #cbd5e1;">
+                {{ message }}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
     <form method="POST">
         <div class="header-flex">
             <div>

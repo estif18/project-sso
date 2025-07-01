@@ -1046,14 +1046,24 @@ def preview_report():
     # Renderiza la plantilla de vista previa con datos de ejemplo
     return render_template('preview_report.html')
 
+
 # Configuración de logging para Azure App Service
 if not app.debug:
     gunicorn_error_logger = logging.getLogger('gunicorn.error')
     app.logger.handlers = gunicorn_error_logger.handlers
     app.logger.setLevel(logging.INFO)
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setLevel(logging.INFO)
-    app.logger.addHandler(handler)
+    if not app.logger.handlers:
+        handler = logging.StreamHandler(sys.stdout)
+        handler.setLevel(logging.INFO)
+        app.logger.addHandler(handler)
+
+# Manejo global de errores para registrar tracebacks en los logs de Azure
+@app.errorhandler(Exception)
+def handle_exception(e):
+    import traceback
+    app.logger.error('Unhandled Exception: %s', e)
+    app.logger.error(traceback.format_exc())
+    return render_template('error.html', mensaje='Ha ocurrido un error interno. Por favor, contacte al administrador.'), 500
 
 if __name__ == '__main__':
     try:

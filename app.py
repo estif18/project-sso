@@ -1,3 +1,7 @@
+@app.route('/health')
+def health():
+    """Health check endpoint for Azure App Service or load balancer probes."""
+    return 'ok', 200
 from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory, make_response
 from flask_sqlalchemy import SQLAlchemy
 import json # Added
@@ -796,40 +800,62 @@ def all_reports():
     selected_asset = request.args.get('asset_id', type=int)
     selected_worker = request.args.get('worker_id', type=int)
 
-    submissions_query = Submission.query
-    if selected_company:
-        submissions_query = submissions_query.filter_by(company_id=selected_company)
-    if selected_asset:
-        submissions_query = submissions_query.filter_by(asset_id=selected_asset)
-    if selected_worker:
-        submissions_query = submissions_query.filter_by(worker_id=selected_worker)
-    submissions = submissions_query.all()
+    try:
+        submissions_query = Submission.query
+        if selected_company:
+            submissions_query = submissions_query.filter_by(company_id=selected_company)
+        if selected_asset:
+            submissions_query = submissions_query.filter_by(asset_id=selected_asset)
+        if selected_worker:
+            submissions_query = submissions_query.filter_by(worker_id=selected_worker)
+        submissions = submissions_query.all()
 
-    # Leer checklist y tools_check desde las nuevas tablas relacionales para cada submission
-    for s in submissions:
-        s.daily_checklist = DailyChecklist.query.filter_by(submission_id=s.id).first()
-        s.tools_check = ToolsCheck.query.filter_by(submission_id=s.id).first()
+        # Leer checklist y tools_check desde las nuevas tablas relacionales para cada submission
+        for s in submissions:
+            try:
+                s.daily_checklist = DailyChecklist.query.filter_by(submission_id=s.id).first()
+            except Exception as e:
+                app.logger.error(f"Error obteniendo DailyChecklist para submission {s.id}: {e}")
+                s.daily_checklist = None
+            try:
+                s.tools_check = ToolsCheck.query.filter_by(submission_id=s.id).first()
+            except Exception as e:
+                app.logger.error(f"Error obteniendo ToolsCheck para submission {s.id}: {e}")
+                s.tools_check = None
 
-    companies = {c.id: c.name for c in Company.query.all()}
-    workers = {w.id: w.name for w in Worker.query.all()}
-    assets = {a.id: a for a in Asset.query.all()}
-    for s in submissions:
-        s.asset = assets.get(s.asset_id)
-        # Obtener cumplimiento por grupo y resumen general
-        group_compliance = GroupCompliance.query.filter_by(submission_id=s.id).all()
-        s.group_compliance = group_compliance
-        resumen = 'Cumple'
-        for gc in group_compliance:
-            if gc.compliance_status == 'No cumple':
-                resumen = 'No cumple'
-                break
-        s.resumen = resumen
-        s.grupos_no_cumple = [gc.group_name for gc in group_compliance if gc.compliance_status == 'No cumple']
-    # Listas para los selects
-    all_companies = Company.query.all()
-    all_assets = Asset.query.all()
-    all_workers = Worker.query.all()
-    return render_template('all_reports.html', submissions=submissions, companies=companies, workers=workers, all_companies=all_companies, all_assets=all_assets, all_workers=all_workers, selected_company=selected_company, selected_asset=selected_asset, selected_worker=selected_worker)
+        companies = {c.id: c.name for c in Company.query.all()}
+        workers = {w.id: w.name for w in Worker.query.all()}
+        assets = {a.id: a for a in Asset.query.all()}
+        valid_submissions = []
+        for s in submissions:
+            try:
+                s.asset = assets.get(s.asset_id)
+                # Obtener cumplimiento por grupo y resumen general
+                group_compliance = GroupCompliance.query.filter_by(submission_id=s.id).all()
+                s.group_compliance = group_compliance
+                resumen = 'Cumple'
+                for gc in group_compliance:
+                    if gc.compliance_status == 'No cumple':
+                        resumen = 'No cumple'
+                        break
+                s.resumen = resumen
+                s.grupos_no_cumple = [gc.group_name for gc in group_compliance if gc.compliance_status == 'No cumple']
+                # Validar que los datos críticos existen
+                if s.asset and s.company_id in companies and s.worker_id in workers:
+                    valid_submissions.append(s)
+                else:
+                    app.logger.warning(f"Submission {s.id} omitido en all_reports por datos faltantes: asset={s.asset}, company_id={s.company_id}, worker_id={s.worker_id}")
+            except Exception as e:
+                app.logger.error(f"Error procesando submission {s.id}: {e}")
+        # Listas para los selects
+        all_companies = Company.query.all()
+        all_assets = Asset.query.all()
+        all_workers = Worker.query.all()
+        return render_template('all_reports.html', submissions=valid_submissions, companies=companies, workers=workers, all_companies=all_companies, all_assets=all_assets, all_workers=all_workers, selected_company=selected_company, selected_asset=selected_asset, selected_worker=selected_worker)
+    except Exception as e:
+        app.logger.error(f"Error en all_reports: {e}")
+        app.logger.error(traceback.format_exc())
+        return render_template('error.html', mensaje='Ha ocurrido un error interno al mostrar los reportes. Por favor, contacte al administrador.'), 500
 
 @app.route('/admin/companies', methods=['GET', 'POST'])
 def admin_companies():

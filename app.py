@@ -246,10 +246,12 @@ def index():
 
 @app.route('/checklist/<int:submission_id>', methods=['GET', 'POST'])
 def checklist(submission_id):
+    app.logger.info(f"Entrando a checklist para submission_id={submission_id}")
     submission = Submission.query.get_or_404(submission_id)
     company = Company.query.get(submission.company_id)
     worker = Worker.query.get(submission.worker_id)
     asset = Asset.query.get(submission.asset_id)
+    app.logger.info(f"Checklist: company={company}, worker={worker}, asset={asset}")
 
     # Definir función y diccionarios al inicio para ambos métodos
     def normalize_equipo(s):
@@ -319,6 +321,7 @@ def checklist(submission_id):
     }
     if request.method == 'POST':
         checklist = dict(request.form)
+        app.logger.info(f"Checklist POST recibido: {checklist}")
         # DEBUG: Mostrar en consola los datos recibidos
         print('--- CHECKLIST SUBMIT DEBUG ---')
         print('Checklist recibido:', checklist)
@@ -493,6 +496,7 @@ def checklist(submission_id):
         )
         db.session.add(daily)
         db.session.commit()
+        app.logger.info(f"DailyChecklist guardado para submission_id={submission.id}, id={daily.id}")
         # Eliminar registros previos de cumplimiento por grupo para este submission
         GroupCompliance.query.filter_by(submission_id=submission.id).delete()
         db.session.commit()
@@ -524,12 +528,15 @@ def checklist(submission_id):
 
 @app.route('/tools_check/<int:submission_id>', methods=['GET', 'POST'])
 def tools_check(submission_id):
+    app.logger.info(f"Entrando a tools_check para submission_id={submission_id}")
     submission = Submission.query.get_or_404(submission_id)
     company = Company.query.get(submission.company_id)
     worker = Worker.query.get(submission.worker_id)
     asset = Asset.query.get(submission.asset_id)
+    app.logger.info(f"ToolsCheck: company={company}, worker={worker}, asset={asset}")
     if request.method == 'POST':
         tools_check = dict(request.form)
+        app.logger.info(f"ToolsCheck POST recibido: {tools_check}")
         # Guardar observaciones
         observaciones = request.form.get('observaciones', '')
         # Guardar foto si se adjunta
@@ -581,6 +588,7 @@ def tools_check(submission_id):
         )
         db.session.add(tools)
         db.session.commit()
+        app.logger.info(f"ToolsCheck guardado para submission_id={submission.id}, id={tools.id}")
         # Eliminar registros previos de cumplimiento por grupo para este submission
         GroupCompliance.query.filter_by(submission_id=submission.id).delete()
         db.session.commit()

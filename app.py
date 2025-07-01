@@ -489,20 +489,6 @@ def checklist(submission_id):
             observaciones=observaciones,
             foto=foto_filename
         )
-@app.route('/add_km_final/<int:checklist_id>', methods=['POST'])
-def add_km_final(checklist_id):
-    daily = DailyChecklist.query.get_or_404(checklist_id)
-    if daily.km_final is None:
-        km_final = request.form.get('km_final')
-        if km_final and km_final.isdigit():
-            daily.km_final = int(km_final)
-            db.session.commit()
-            flash('Kilometraje final guardado correctamente.', 'success')
-        else:
-            flash('Ingrese un valor válido para el kilometraje final.', 'error')
-    else:
-        flash('El kilometraje final ya fue registrado.', 'info')
-    return redirect(request.referrer or url_for('report', submission_id=daily.submission_id))
         db.session.add(daily)
         db.session.commit()
         # Eliminar registros previos de cumplimiento por grupo para este submission
@@ -531,7 +517,8 @@ def add_km_final(checklist_id):
                 grupos_no_cumple.append(nombre)
         db.session.commit()
         return redirect(url_for('tools_check', submission_id=submission.id))
-    return render_template(plantilla, submission=submission, company=company, worker=worker, asset=asset)
+    companies = Company.query.all()
+    return render_template('form.html', companies=companies)
 
 @app.route('/tools_check/<int:submission_id>', methods=['GET', 'POST'])
 def tools_check(submission_id):

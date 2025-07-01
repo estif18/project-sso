@@ -11,6 +11,8 @@ from PIL import Image, ExifTags
 
 import mysql.connector # Added
 import unicodedata
+import logging
+import sys
 
 def test_mysql_connector():
     try:
@@ -1035,6 +1037,15 @@ def migrar_checklists():
 def preview_report():
     # Renderiza la plantilla de vista previa con datos de ejemplo
     return render_template('preview_report.html')
+
+# Configuración de logging para Azure App Service
+if not app.debug:
+    gunicorn_error_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers = gunicorn_error_logger.handlers
+    app.logger.setLevel(logging.INFO)
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setLevel(logging.INFO)
+    app.logger.addHandler(handler)
 
 if __name__ == '__main__':
     try:

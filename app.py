@@ -81,6 +81,8 @@ class DailyChecklist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     submission_id = db.Column(db.Integer, db.ForeignKey('submission.id'), nullable=False)
     prox_mantto = db.Column(db.Date)
+    km_inicial = db.Column(db.Integer)
+    km_final = db.Column(db.Integer)
     item0 = db.Column(db.String(5))
     item1 = db.Column(db.String(5))
     item2 = db.Column(db.String(5))
@@ -436,6 +438,7 @@ def checklist(submission_id):
         daily = DailyChecklist(
             submission_id=submission.id,
             prox_mantto=request.form.get('prox_mantto'),
+            km_inicial=request.form.get('km_inicial'),
             item0=request.form.get('item0'),
             item1=request.form.get('item1'),
             item2=request.form.get('item2'),
@@ -486,6 +489,20 @@ def checklist(submission_id):
             observaciones=observaciones,
             foto=foto_filename
         )
+@app.route('/add_km_final/<int:checklist_id>', methods=['POST'])
+def add_km_final(checklist_id):
+    daily = DailyChecklist.query.get_or_404(checklist_id)
+    if daily.km_final is None:
+        km_final = request.form.get('km_final')
+        if km_final and km_final.isdigit():
+            daily.km_final = int(km_final)
+            db.session.commit()
+            flash('Kilometraje final guardado correctamente.', 'success')
+        else:
+            flash('Ingrese un valor válido para el kilometraje final.', 'error')
+    else:
+        flash('El kilometraje final ya fue registrado.', 'info')
+    return redirect(request.referrer or url_for('report', submission_id=daily.submission_id))
         db.session.add(daily)
         db.session.commit()
         # Eliminar registros previos de cumplimiento por grupo para este submission

@@ -243,24 +243,7 @@
                 </tr>
             </table>
             <table style="margin-bottom:10px;">
-                <tr>
-                    <th style="width:180px;">CÓDIGO DE EQUIPO</th>
-                    <td>{{ asset.code }}</td>
-                    <th>Kilometraje u Horómetro</th>
-                    <td colspan="3">
-                        Inicial: {{ checklist.km_inicial if checklist.km_inicial is defined else '________' }}
-                        &nbsp;&nbsp;|
-                        Final:
-                        {% if checklist.km_final is defined and checklist.km_final %}
-                            {{ checklist.km_final }}
-                        {% else %}
-                            <form method="POST" action="{{ url_for('add_km_final', checklist_id=daily_checklist.id) }}" style="display:inline;">
-                                <input type="number" name="km_final" min="0" step="1" required placeholder="Ingrese km final" style="width:110px;">
-                                <button type="submit" style="padding:2px 8px;">Guardar</button>
-                            </form>
-                        {% endif %}
-                    </td>
-                </tr>
+                <tr><th style="width:180px;">CÓDIGO DE EQUIPO</th><td>{{ asset.code }}</td><th>Kilometraje u Horómetro</th><td colspan="3">Inicial: ________  Final: ________</td></tr>
                 <tr><th>DESCRIPCIÓN DE EQUIPO</th><td>{{ asset.type }}</td><th>Conductor</th><td>{{ worker.name }}</td><th>Fecha</th><td>{{ created_at.strftime('%d/%m/%Y') }}</td></tr>
             </table>
             {% set checklist = daily_checklist.to_dict() if daily_checklist else {} %}

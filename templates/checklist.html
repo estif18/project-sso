@@ -1,65 +1,14 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Checklist Diario</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        body { background: #f8f9fa; font-family: 'Segoe UI', Arial, sans-serif; }
-        .container { max-width: 700px; margin: 32px auto; background: #fff; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); padding: 32px 36px; border: 1px solid #e2e8f0; }
-        h1 { text-align: center; color: #1a202c; margin-bottom: 18px; }
-        .info { margin-bottom: 24px; background: #f1f5f9; border-radius: 8px; padding: 16px 20px; border: 1px solid #cbd5e1; }
-        label { font-weight: 600; margin-bottom: 4px; display: block; }
-        select, input[type="text"], textarea { width: 100%; padding: 8px 12px; border-radius: 5px; border: 1px solid #cbd5e1; font-size: 1em; margin-bottom: 16px; background: #f9fafb; }
-        button[type="submit"] { background: linear-gradient(90deg, #3182ce 0%, #63b3ed 100%); color: #fff; padding: 12px 32px; border-radius: 6px; font-size: 1.1em; font-weight: 600; border: none; box-shadow: 0 2px 8px #b6c2d1; cursor: pointer; transition: background 0.2s; }
-        button[type="submit"]:hover { background: linear-gradient(90deg, #2563eb 0%, #4299e1 100%); }
-        .group-title { font-size: 1.1em; color: #2563eb; margin-top: 18px; margin-bottom: 8px; font-weight: 700; }
-    </style>
+    <title>Redireccionando...</title>
+    <meta http-equiv="refresh" content="0; url={{ url_for('index') }}">
+    <script>
+        // Redirección inmediata por JS como fallback
+        window.location.replace("{{ url_for('index') }}");
+    </script>
 </head>
 <body>
-    <div class="container">
-        <h1>Checklist Diario</h1>
-        <div class="info">
-            <strong>Empresa:</strong> {{ company.name }}<br>
-            <strong>Trabajador:</strong> {{ worker.name }}<br>
-            <strong>Equipo:</strong> {{ asset.type }} - {{ asset.code }}
-        </div>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <div style="margin-bottom:18px;">
-              {% for category, message in messages %}
-                {% if category == 'error' %}
-                  <div style="padding:10px 16px;border-radius:6px;font-weight:600;background:#ffe5e5;color:#b91c1c;border:1px solid #fca5a5;">{{ message }}</div>
-                {% elif category == 'success' %}
-                  <div style="padding:10px 16px;border-radius:6px;font-weight:600;background:#e6ffed;color:#166534;border:1px solid #6ee7b7;">{{ message }}</div>
-                {% else %}
-                  <div style="padding:10px 16px;border-radius:6px;font-weight:600;background:#f1f5f9;color:#334155;border:1px solid #cbd5e1;">{{ message }}</div>
-                {% endif %}
-              {% endfor %}
-            </div>
-          {% endif %}
-        {% endwith %}
-        <form method="POST" enctype="multipart/form-data">
-            <label for="prox_mantto">Próximo Mantenimiento:</label>
-            <input type="text" id="prox_mantto" name="prox_mantto" placeholder="Ej: 2025-07-15">
-            <label for="km_inicial">Kilometraje Inicial:</label>
-            <input type="text" id="km_inicial" name="km_inicial" placeholder="Ej: 123456">
-            <div class="group-title">Checkeo Diario</div>
-            {% for i in range(0, 5) %}
-                <label for="item{{i}}">Item {{i}}:</label>
-                <select id="item{{i}}" name="item{{i}}">
-                    <option value="C">Cumple</option>
-                    <option value="NC">No Cumple</option>
-                    <option value="NA">No Aplica</option>
-                </select>
-            {% endfor %}
-            <label for="observaciones">Observaciones:</label>
-            <textarea id="observaciones" name="observaciones" rows="3"></textarea>
-            <label for="foto">Foto (opcional):</label>
-            <input type="file" id="foto" name="foto" accept="image/*">
-            <button type="submit">Guardar y Continuar</button>
-        </form>
-    </div>
 </body>
 </html>

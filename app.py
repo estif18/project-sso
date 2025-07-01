@@ -1,17 +1,16 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory, make_response
 from flask_sqlalchemy import SQLAlchemy
-import json
+import json # Added
 from datetime import datetime
-import pytz
-import os
+import pytz # Added
+import os # Added
 from werkzeug.utils import secure_filename
 from sqlalchemy import Enum as SqlEnum, text
+
 from PIL import Image, ExifTags
-import mysql.connector
+
+import mysql.connector # Added
 import unicodedata
-import logging
-import sys
-import sys
 
 def test_mysql_connector():
     try:
@@ -30,12 +29,6 @@ def test_mysql_connector():
         print("MySQL direct connection failed:", e)
 
 app = Flask(__name__)
-
-# Health check endpoint (debe ir después de crear 'app')
-@app.route('/health')
-def health():
-    """Health check endpoint for Azure App Service or load balancer probes."""
-    return 'ok', 200
 app.config['SQLALCHEMY_DATABASE_URI'] = (
     'mysql+pymysql://ADmin296:prac_seg296@gestion-sso.mysql.database.azure.com/gestion_empresas'
     '?charset=utf8mb4'
@@ -88,8 +81,6 @@ class DailyChecklist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     submission_id = db.Column(db.Integer, db.ForeignKey('submission.id'), nullable=False)
     prox_mantto = db.Column(db.Date)
-    km_inicial = db.Column(db.Integer)
-    km_final = db.Column(db.Integer)
     item0 = db.Column(db.String(5))
     item1 = db.Column(db.String(5))
     item2 = db.Column(db.String(5))
@@ -251,12 +242,10 @@ def index():
 
 @app.route('/checklist/<int:submission_id>', methods=['GET', 'POST'])
 def checklist(submission_id):
-    app.logger.info(f"Entrando a checklist para submission_id={submission_id}")
     submission = Submission.query.get_or_404(submission_id)
     company = Company.query.get(submission.company_id)
     worker = Worker.query.get(submission.worker_id)
     asset = Asset.query.get(submission.asset_id)
-    app.logger.info(f"Checklist: company={company}, worker={worker}, asset={asset}")
 
     # Definir función y diccionarios al inicio para ambos métodos
     def normalize_equipo(s):
@@ -326,24 +315,42 @@ def checklist(submission_id):
     }
     if request.method == 'POST':
         checklist = dict(request.form)
-        app.logger.info(f"Checklist POST recibido: {checklist}")
-        # --- AUTOCOMPLETAR TODOS LOS CAMPOS REQUERIDOS SEGÚN EL TIPO DE EQUIPO CON 'NA' SI FALTAN O ESTÁN VACÍOS ---
-        tipo_equipo = normalize_equipo(asset.type) if asset and asset.type else ''
-        grupos_relevantes = grupos_por_equipo.get(tipo_equipo, [])
-        requeridos = set()
-        for grupo in grupos_relevantes:
-            requeridos.update(grupos_items[grupo])
-        # Autocompletar con 'NA' los campos requeridos que falten o estén vacíos
-        for key in requeridos:
-            if key not in checklist or checklist.get(key) in (None, '', 'None'):
-                checklist[key] = 'NA'
-        # DEBUG: Mostrar en consola los datos recibidos y los requeridos
+        # DEBUG: Mostrar en consola los datos recibidos
         print('--- CHECKLIST SUBMIT DEBUG ---')
         print('Checklist recibido:', checklist)
         print('Campos requeridos:')
-        for key in sorted(requeridos):
-            print(f'{key}:', checklist.get(key))
-        # Validar que todos los campos requeridos estén presentes y respondidos (debería cumplirse tras autocompletar)
+        for i in range(0, 20):
+            print(f'item{i}:', checklist.get(f'item{i}'))
+        for i in range(1, 10):
+            print(f'item{100+i}:', checklist.get(f'item{100+i}'))
+        for i in range(1, 7):
+            print(f'item{200+i}:', checklist.get(f'item{200+i}'))
+        for i in range(1, 3):
+            print(f'item{300+i}:', checklist.get(f'item{300+i}'))
+        for i in range(1, 7):
+            print(f'item{400+i}:', checklist.get(f'item{400+i}'))
+        for i in range(1, 3):
+            print(f'item{500+i}:', checklist.get(f'item{500+i}'))
+        for i in range(1, 3):
+            print(f'item{600+i}:', checklist.get(f'item{600+i}'))
+        # Validar que todos los campos requeridos estén presentes (ejemplo para los primeros 20)
+        missing = []
+        for i in range(0, 20):
+            if f'item{i}' not in checklist or checklist.get(f'item{i}') in (None, '', 'None'):
+                missing.append(f'item{i}')
+        if missing:
+            flash(f'Faltan respuestas en: {", ".join(missing)}. Revisa el autocompletado de NA.', 'error')
+            print('FALTAN CAMPOS:', missing)
+            return render_template(plantilla, submission=submission, company=company, worker=worker, asset=asset)
+        # --- VALIDACIÓN DE TODOS LOS CAMPOS REQUERIDOS SEGÚN EL TIPO DE EQUIPO ---
+        # Determinar los grupos relevantes para el equipo actual
+        tipo_equipo = normalize_equipo(asset.type) if asset and asset.type else ''
+        grupos_relevantes = grupos_por_equipo.get(tipo_equipo, [])
+        # Obtener todos los campos requeridos para este equipo
+        requeridos = set()
+        for grupo in grupos_relevantes:
+            requeridos.update(grupos_items[grupo])
+        # Validar que todos los campos requeridos estén presentes y respondidos
         missing = []
         for key in requeridos:
             if key not in checklist or checklist.get(key) in (None, '', 'None'):
@@ -429,7 +436,6 @@ def checklist(submission_id):
         daily = DailyChecklist(
             submission_id=submission.id,
             prox_mantto=request.form.get('prox_mantto'),
-            km_inicial=request.form.get('km_inicial'),
             item0=request.form.get('item0'),
             item1=request.form.get('item1'),
             item2=request.form.get('item2'),
@@ -482,7 +488,6 @@ def checklist(submission_id):
         )
         db.session.add(daily)
         db.session.commit()
-        app.logger.info(f"DailyChecklist guardado para submission_id={submission.id}, id={daily.id}")
         # Eliminar registros previos de cumplimiento por grupo para este submission
         GroupCompliance.query.filter_by(submission_id=submission.id).delete()
         db.session.commit()
@@ -509,49 +514,16 @@ def checklist(submission_id):
                 grupos_no_cumple.append(nombre)
         db.session.commit()
         return redirect(url_for('tools_check', submission_id=submission.id))
-    companies = Company.query.all()
-    return render_template('form.html', companies=companies)
+    return render_template(plantilla, submission=submission, company=company, worker=worker, asset=asset)
 
 @app.route('/tools_check/<int:submission_id>', methods=['GET', 'POST'])
 def tools_check(submission_id):
-    app.logger.info(f"Entrando a tools_check para submission_id={submission_id}")
     submission = Submission.query.get_or_404(submission_id)
     company = Company.query.get(submission.company_id)
     worker = Worker.query.get(submission.worker_id)
     asset = Asset.query.get(submission.asset_id)
-    app.logger.info(f"ToolsCheck: company={company}, worker={worker}, asset={asset}")
     if request.method == 'POST':
         tools_check = dict(request.form)
-        app.logger.info(f"ToolsCheck POST recibido: {tools_check}")
-
-        # --- AUTOCOMPLETAR TODOS LOS CAMPOS REQUERIDOS CON 'NA' SI FALTAN O ESTÁN VACÍOS ---
-        requeridos = [
-            f'herr_item{i}' for i in range(1, 9)
-        ] + [
-            'kit_panos','kit_pico','kit_lampa','kit_costales','kit_salchicha','kit_bandeja','kit_tacos','kit_trajes','kit_guantes',
-            'otros_soat','otros_propiedad','otros_circulacion','otros_licencia'
-        ]
-        for key in requeridos:
-            if key not in tools_check or tools_check.get(key) in (None, '', 'None'):
-                tools_check[key] = 'NA'
-
-        # DEBUG: Mostrar en consola los datos recibidos y los requeridos
-        print('--- TOOLS_CHECK SUBMIT DEBUG ---')
-        print('ToolsCheck recibido:', tools_check)
-        print('Campos requeridos:')
-        for key in requeridos:
-            print(f'{key}:', tools_check.get(key))
-
-        # Validar que todos los campos requeridos estén presentes y respondidos (debería cumplirse tras autocompletar)
-        missing = []
-        for key in requeridos:
-            if key not in tools_check or tools_check.get(key) in (None, '', 'None'):
-                missing.append(key)
-        if missing:
-            flash(f'Faltan respuestas en: {", ".join(missing)}. Revisa el autocompletado de NA.', 'error')
-            print('FALTAN CAMPOS:', missing)
-            return render_template('tools_check.html', submission=submission, company=company, worker=worker, asset=asset)
-
         # Guardar observaciones
         observaciones = request.form.get('observaciones', '')
         # Guardar foto si se adjunta
@@ -565,7 +537,6 @@ def tools_check(submission_id):
                 corregir_orientacion_imagen(filepath)
             else:
                 flash('Formato de imagen no permitido.', 'error')
-
         # Crear registro en ToolsCheck
         def parse_date_field(val):
             if val in (None, '', 'None'):
@@ -576,35 +547,34 @@ def tools_check(submission_id):
                 return None
         tools = ToolsCheck(
             submission_id=submission.id,
-            herr_item1=tools_check.get('herr_item1'),
-            herr_item2=tools_check.get('herr_item2'),
-            herr_item3=tools_check.get('herr_item3'),
+            herr_item1=request.form.get('herr_item1'),
+            herr_item2=request.form.get('herr_item2'),
+            herr_item3=request.form.get('herr_item3'),
             herr_extintor_fecha=parse_date_field(request.form.get('herr_extintor_fecha')),
-            herr_item4=tools_check.get('herr_item4'),
-            herr_item5=tools_check.get('herr_item5'),
-            herr_item6=tools_check.get('herr_item6'),
-            herr_item7=tools_check.get('herr_item7'),
-            herr_item8=tools_check.get('herr_item8'),
-            kit_panos=tools_check.get('kit_panos'),
-            kit_pico=tools_check.get('kit_pico'),
-            kit_lampa=tools_check.get('kit_lampa'),
-            kit_costales=tools_check.get('kit_costales'),
-            kit_salchicha=tools_check.get('kit_salchicha'),
-            kit_bandeja=tools_check.get('kit_bandeja'),
-            kit_tacos=tools_check.get('kit_tacos'),
-            kit_trajes=tools_check.get('kit_trajes'),
-            kit_guantes=tools_check.get('kit_guantes'),
-            otros_soat=tools_check.get('otros_soat'),
+            herr_item4=request.form.get('herr_item4'),
+            herr_item5=request.form.get('herr_item5'),
+            herr_item6=request.form.get('herr_item6'),
+            herr_item7=request.form.get('herr_item7'),
+            herr_item8=request.form.get('herr_item8'),
+            kit_panos=request.form.get('kit_panos'),
+            kit_pico=request.form.get('kit_pico'),
+            kit_lampa=request.form.get('kit_lampa'),
+            kit_costales=request.form.get('kit_costales'),
+            kit_salchicha=request.form.get('kit_salchicha'),
+            kit_bandeja=request.form.get('kit_bandeja'),
+            kit_tacos=request.form.get('kit_tacos'),
+            kit_trajes=request.form.get('kit_trajes'),
+            kit_guantes=request.form.get('kit_guantes'),
+            otros_soat=request.form.get('otros_soat'),
             otros_soat_fecha=parse_date_field(request.form.get('otros_soat_fecha')),
-            otros_propiedad=tools_check.get('otros_propiedad'),
-            otros_circulacion=tools_check.get('otros_circulacion'),
-            otros_licencia=tools_check.get('otros_licencia'),
+            otros_propiedad=request.form.get('otros_propiedad'),
+            otros_circulacion=request.form.get('otros_circulacion'),
+            otros_licencia=request.form.get('otros_licencia'),
             observaciones=observaciones,
             foto=foto_filename
         )
         db.session.add(tools)
         db.session.commit()
-        app.logger.info(f"ToolsCheck guardado para submission_id={submission.id}, id={tools.id}")
         # Eliminar registros previos de cumplimiento por grupo para este submission
         GroupCompliance.query.filter_by(submission_id=submission.id).delete()
         db.session.commit()
@@ -801,62 +771,40 @@ def all_reports():
     selected_asset = request.args.get('asset_id', type=int)
     selected_worker = request.args.get('worker_id', type=int)
 
-    try:
-        submissions_query = Submission.query
-        if selected_company:
-            submissions_query = submissions_query.filter_by(company_id=selected_company)
-        if selected_asset:
-            submissions_query = submissions_query.filter_by(asset_id=selected_asset)
-        if selected_worker:
-            submissions_query = submissions_query.filter_by(worker_id=selected_worker)
-        submissions = submissions_query.all()
+    submissions_query = Submission.query
+    if selected_company:
+        submissions_query = submissions_query.filter_by(company_id=selected_company)
+    if selected_asset:
+        submissions_query = submissions_query.filter_by(asset_id=selected_asset)
+    if selected_worker:
+        submissions_query = submissions_query.filter_by(worker_id=selected_worker)
+    submissions = submissions_query.all()
 
-        # Leer checklist y tools_check desde las nuevas tablas relacionales para cada submission
-        for s in submissions:
-            try:
-                s.daily_checklist = DailyChecklist.query.filter_by(submission_id=s.id).first()
-            except Exception as e:
-                app.logger.error(f"Error obteniendo DailyChecklist para submission {s.id}: {e}")
-                s.daily_checklist = None
-            try:
-                s.tools_check = ToolsCheck.query.filter_by(submission_id=s.id).first()
-            except Exception as e:
-                app.logger.error(f"Error obteniendo ToolsCheck para submission {s.id}: {e}")
-                s.tools_check = None
+    # Leer checklist y tools_check desde las nuevas tablas relacionales para cada submission
+    for s in submissions:
+        s.daily_checklist = DailyChecklist.query.filter_by(submission_id=s.id).first()
+        s.tools_check = ToolsCheck.query.filter_by(submission_id=s.id).first()
 
-        companies = {c.id: c.name for c in Company.query.all()}
-        workers = {w.id: w.name for w in Worker.query.all()}
-        assets = {a.id: a for a in Asset.query.all()}
-        valid_submissions = []
-        for s in submissions:
-            try:
-                s.asset = assets.get(s.asset_id)
-                # Obtener cumplimiento por grupo y resumen general
-                group_compliance = GroupCompliance.query.filter_by(submission_id=s.id).all()
-                s.group_compliance = group_compliance
-                resumen = 'Cumple'
-                for gc in group_compliance:
-                    if gc.compliance_status == 'No cumple':
-                        resumen = 'No cumple'
-                        break
-                s.resumen = resumen
-                s.grupos_no_cumple = [gc.group_name for gc in group_compliance if gc.compliance_status == 'No cumple']
-                # Validar que los datos críticos existen
-                if s.asset and s.company_id in companies and s.worker_id in workers:
-                    valid_submissions.append(s)
-                else:
-                    app.logger.warning(f"Submission {s.id} omitido en all_reports por datos faltantes: asset={s.asset}, company_id={s.company_id}, worker_id={s.worker_id}")
-            except Exception as e:
-                app.logger.error(f"Error procesando submission {s.id}: {e}")
-        # Listas para los selects
-        all_companies = Company.query.all()
-        all_assets = Asset.query.all()
-        all_workers = Worker.query.all()
-        return render_template('all_reports.html', submissions=valid_submissions, companies=companies, workers=workers, all_companies=all_companies, all_assets=all_assets, all_workers=all_workers, selected_company=selected_company, selected_asset=selected_asset, selected_worker=selected_worker)
-    except Exception as e:
-        app.logger.error(f"Error en all_reports: {e}")
-        app.logger.error(traceback.format_exc())
-        return render_template('error.html', mensaje='Ha ocurrido un error interno al mostrar los reportes. Por favor, contacte al administrador.'), 500
+    companies = {c.id: c.name for c in Company.query.all()}
+    workers = {w.id: w.name for w in Worker.query.all()}
+    assets = {a.id: a for a in Asset.query.all()}
+    for s in submissions:
+        s.asset = assets.get(s.asset_id)
+        # Obtener cumplimiento por grupo y resumen general
+        group_compliance = GroupCompliance.query.filter_by(submission_id=s.id).all()
+        s.group_compliance = group_compliance
+        resumen = 'Cumple'
+        for gc in group_compliance:
+            if gc.compliance_status == 'No cumple':
+                resumen = 'No cumple'
+                break
+        s.resumen = resumen
+        s.grupos_no_cumple = [gc.group_name for gc in group_compliance if gc.compliance_status == 'No cumple']
+    # Listas para los selects
+    all_companies = Company.query.all()
+    all_assets = Asset.query.all()
+    all_workers = Worker.query.all()
+    return render_template('all_reports.html', submissions=submissions, companies=companies, workers=workers, all_companies=all_companies, all_assets=all_assets, all_workers=all_workers, selected_company=selected_company, selected_asset=selected_asset, selected_worker=selected_worker)
 
 @app.route('/admin/companies', methods=['GET', 'POST'])
 def admin_companies():
@@ -1084,33 +1032,12 @@ def preview_report():
     # Renderiza la plantilla de vista previa con datos de ejemplo
     return render_template('preview_report.html')
 
-
-# Configuración de logging para Azure App Service
-if not app.debug:
-    gunicorn_error_logger = logging.getLogger('gunicorn.error')
-    app.logger.handlers = gunicorn_error_logger.handlers
-    app.logger.setLevel(logging.INFO)
-    if not app.logger.handlers:
-        handler = logging.StreamHandler(sys.stdout)
-        handler.setLevel(logging.INFO)
-        app.logger.addHandler(handler)
-
-# Manejo global de errores para registrar tracebacks en los logs de Azure
-@app.errorhandler(Exception)
-def handle_exception(e):
-    import traceback
-    app.logger.error('Unhandled Exception: %s', e)
-    app.logger.error(traceback.format_exc())
-    return render_template('error.html', mensaje='Ha ocurrido un error interno. Por favor, contacte al administrador.'), 500
-
 if __name__ == '__main__':
     try:
         test_mysql_connector()
         with app.app_context():
             db.create_all()
-        # Leer el puerto desde la variable de entorno PORT (usado por Azure App Service)
-        port = int(os.environ.get('PORT', 8080))
-        app.run(debug=True, host='0.0.0.0', port=port)
+        app.run(debug=True, port=8080)
     except Exception as e:
         import traceback
         print('--- APP STARTUP ERROR ---')

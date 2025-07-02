@@ -25,11 +25,15 @@
   {% endif %}
 {% endwith %}
 <form method="POST" enctype="multipart/form-data" style="max-width:900px;margin:auto;">
+    <div style="margin-bottom:12px;text-align:right;">
+        <label for="km_inicial"><b>KILOMETRAJE INICIAL:</b></label>
+        <input type="number" name="km_inicial" id="km_inicial" min="0" step="1" required style="width:120px;">
+    </div>
     <table class="checklist-table">
         <tbody>
             <!-- Bloque: GENERAL (EQUIPO APAGADO) -->
             <tr><th colspan="5" class="checklist-section checklist-section-title">GENERAL (EQUIPO APAGADO)</th></tr>
-            <tr><td class="checklist-label">PROX MANTTO:</td><td colspan="4"><input type="date" name="prox_mantto" required></td></tr>
+            <tr><td class="checklist-label">PRÓXIMO MANTENIMIENTO (KILOMETRAJE):</td><td colspan="4"><input type="number" name="prox_mantto" min="0" step="1" required></td></tr>
             <tr><td class="checklist-label">CHEQUEO EL STICKER SI LLEGA AL KILOMETRAJE DE MANTTO LLEVE AL TALLER*</td><td colspan="4"><div class="checklist-btns"><label><input type="radio" name="item0" value="C" required> C</label><label><input type="radio" name="item0" value="NC"> NC</label><label><input type="radio" name="item0" value="NA"> NA</label></div></td></tr>
             {% set items1 = [
                 'CHEQUEE SI LA UNIDAD TIENE ALGÚN ROCE, ABOLLADURA, ETC.',

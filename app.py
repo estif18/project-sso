@@ -80,7 +80,8 @@ class GroupCompliance(db.Model):
 class DailyChecklist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     submission_id = db.Column(db.Integer, db.ForeignKey('submission.id'), nullable=False)
-    prox_mantto = db.Column(db.Date)
+    prox_mantto = db.Column(db.Integer)  # Kilometraje para próximo mantenimiento
+    km_inicial = db.Column(db.Integer)  # Nuevo: kilometraje inicial
     item0 = db.Column(db.String(5))
     item1 = db.Column(db.String(5))
     item2 = db.Column(db.String(5))
@@ -133,9 +134,6 @@ class DailyChecklist(db.Model):
 
     def to_dict(self):
         d = {col: getattr(self, col) for col in self.__table__.columns.keys()}
-        # Formatear fechas a string para Jinja2 si es necesario
-        if d.get('prox_mantto') and isinstance(d['prox_mantto'], (datetime,)):
-            d['prox_mantto'] = d['prox_mantto'].strftime('%Y-%m-%d')
         return d
 
 class ToolsCheck(db.Model):
@@ -433,9 +431,19 @@ def checklist(submission_id):
                 if key not in requeridos and key not in checklist:
                     checklist[key] = 'NA'
         # Crear registro en DailyChecklist
+        # Validar y convertir el kilometraje a entero
+        try:
+            prox_mantto_val = int(request.form.get('prox_mantto', '0'))
+        except Exception:
+            prox_mantto_val = 0
+        try:
+            km_inicial_val = int(request.form.get('km_inicial', '0'))
+        except Exception:
+            km_inicial_val = 0
         daily = DailyChecklist(
             submission_id=submission.id,
-            prox_mantto=request.form.get('prox_mantto'),
+            prox_mantto=prox_mantto_val,
+            km_inicial=km_inicial_val,
             item0=request.form.get('item0'),
             item1=request.form.get('item1'),
             item2=request.form.get('item2'),
@@ -675,7 +683,8 @@ def report(submission_id):
     # --- Generar checklist_rows serializable para el PDF ---
     checklist_desc = {
         'item0': 'CHEQUEO EL STICKER SI LLEGA AL KILOMETRAJE DE MANTTO LLEVE AL TALLER',
-        'prox_mantto': 'PROX MANTTO',
+        'prox_mantto': 'PRÓXIMO MANTENIMIENTO (KILOMETRAJE)',
+        'km_inicial': 'KILOMETRAJE INICIAL',
         'item1': 'CHEQUEE SI LA UNIDAD TIENE ALGÚN ROCE, ABOLLADURA, ETC.',
         'item2': 'VERIFIQUE QUE NO EXISTAN FUGAS DE ACEITE, AGUA, COMBUSTIBLE*',
         'item3': 'PURGAR EL AGUA DEL FILTRO DE PETRÓLEO*',
@@ -762,6 +771,7 @@ def report(submission_id):
         device_info=platform.platform(),
         _has_obs=_has_obs,
         _obs=_obs,
+        km_inicial=daily_checklist.km_inicial if daily_checklist else None,
     )
 
 @app.route('/all_reports', methods=['GET', 'POST'])

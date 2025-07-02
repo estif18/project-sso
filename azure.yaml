@@ -1,0 +1,10 @@
+name: flask-app
+metadata:
+  template: azd-python-flask
+services:
+  flask-app:
+    project: .
+    language: python
+    host: appservice
+    port: 8080
+    # env section removed as per AZD requirements. Only project, language, host, port are allowed.

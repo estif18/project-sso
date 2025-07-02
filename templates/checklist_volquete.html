@@ -25,6 +25,10 @@
   {% endif %}
 {% endwith %}
 <form method="POST" enctype="multipart/form-data" style="max-width:950px;margin:auto;">
+    <div style="margin-bottom:12px;text-align:right;">
+        <label for="km_inicial"><b>KILOMETRAJE INICIAL:</b></label>
+        <input type="number" name="km_inicial" id="km_inicial" min="0" step="1" required style="width:120px;">
+    </div>
     <table class="checklist-table">
         <thead>
             <tr><th colspan="5" class="checklist-section-title">GENERAL (EQUIPO APAGADO)</th></tr>
@@ -32,7 +36,7 @@
         <tbody>
             <tr>
                 <td class="checklist-label">PROX MANTTO:</td>
-                <td colspan="4"><input type="date" name="prox_mantto" required style="width:170px;"></td>
+                <td colspan="4"><input type="number" name="prox_mantto" min="0" step="1" required style="width:170px;"></td>
             </tr>
             <tr>
                 <td class="checklist-label">CHEQUEO EL STICKER SI LLEGA AL KILOMETRAJE DE MANTTO LLEVE AL TALLER*</td>

@@ -9,30 +9,15 @@ from sqlalchemy import Enum as SqlEnum, text
 
 from PIL import Image, ExifTags
 
-import mysql.connector # Added
+import unicodedata
 import unicodedata
 
 def test_mysql_connector():
-    try:
-        cnx = mysql.connector.connect(
-            user="ADmin296",
-            password="prac_seg296",
-            host="gestion-sso.mysql.database.azure.com",
-            port=3306,
-            database="gestion_empresas",
-            ssl_ca="DigiCertGlobalRootCA.crt.pem",
-            ssl_disabled=False
-        )
-        print("MySQL direct connection successful!")
-        cnx.close()
-    except Exception as e:
-        print("MySQL direct connection failed:", e)
+    pass  # Eliminado: ya no se usa MySQL
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = (
-    'mysql+pymysql://ADmin296:prac_seg296@gestion-sso.mysql.database.azure.com/gestion_empresas'
-    '?charset=utf8mb4'
-    '&ssl_ca=DigiCertGlobalRootCA.crt.pem'
+    'postgresql://xjqopdmlxt:QcLGUt1CQ2riK$Wp@ssoma-berlin-server.postgres.database.azure.com:5432/postgres'
 )
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'supersecretkey'

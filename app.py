@@ -12,8 +12,7 @@ from PIL import Image, ExifTags
 import unicodedata
 import unicodedata
 
-def test_mysql_connector():
-    pass  # Eliminado: ya no se usa MySQL
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = (
@@ -1029,7 +1028,6 @@ def preview_report():
 
 if __name__ == '__main__':
     try:
-        test_mysql_connector()
         with app.app_context():
             db.create_all()
         app.run(debug=True, port=8080)

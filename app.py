@@ -1027,8 +1027,9 @@ def preview_report():
     return render_template('preview_report.html')
 
 
-# --- Endpoint seguro para crear tablas en la base de datos (solo uso temporal/admin) ---
-import functools
+def check_admin():
+
+
 from flask import Response
 
 def check_admin():
@@ -1037,10 +1038,6 @@ def check_admin():
     token = request.args.get('token') or request.headers.get('X-Admin-Token')
     return token == ADMIN_TOKEN
 
-
-
-
-# --- Endpoint seguro para crear tablas en la base de datos (solo uso temporal/admin) ---
 @app.route('/admin/create_tables', methods=['POST'])
 def admin_create_tables():
     if not check_admin():
@@ -1054,7 +1051,6 @@ def admin_create_tables():
         print(e)
         traceback.print_exc()
         return {'status': 'error', 'message': str(e)}
-
 # --- Fin endpoint seguro ---
 
 if __name__ == '__main__':

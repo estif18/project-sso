@@ -1049,6 +1049,10 @@ def admin_create_tables():
         db.create_all()
         return {'status': 'ok', 'message': 'Tablas creadas correctamente en la base de datos.'}
     except Exception as e:
+        import traceback
+        print('--- ERROR EN /admin/create_tables ---')
+        print(e)
+        traceback.print_exc()
         return {'status': 'error', 'message': str(e)}
 
 # --- Fin endpoint seguro ---

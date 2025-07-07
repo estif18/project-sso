@@ -16,7 +16,7 @@ import unicodedata
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = (
-    'postgresql://xjqopdmlxt:QcLGUt1CQ2riK$Wp@ssoma-berlin-server.postgres.database.azure.com:5432/postgres'
+    'mssql+pyodbc://admin296@ssoma-pallca:ssoma-pallca@ssoma-pallca.database.windows.net:1433/ssoma-pallca?driver=ODBC+Driver+17+for+SQL+Server&encrypt=yes&trustServerCertificate=no&hostNameInCertificate=*.database.windows.net&loginTimeout=30'
 )
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'supersecretkey'
@@ -1025,6 +1025,42 @@ def migrar_checklists():
 def preview_report():
     # Renderiza la plantilla de vista previa con datos de ejemplo
     return render_template('preview_report.html')
+
+
+# --- Endpoint seguro para crear tablas en la base de datos (solo uso temporal/admin) ---
+import functools
+from flask import Response
+
+def check_admin():
+    # Cambia este token por uno seguro y mantenlo privado
+    ADMIN_TOKEN = os.environ.get('ADMIN_CREATEALL_TOKEN', 'supersecreto')
+    token = request.args.get('token') or request.headers.get('X-Admin-Token')
+    return token == ADMIN_TOKEN
+
+@app.route('/admin/create_tables', methods=['POST'])
+def admin_create_tables():
+    if not check_admin():
+        return Response('No autorizado', status=401)
+    try:
+        db.create_all()
+        return {'status': 'ok', 'message': 'Tablas creadas correctamente en la base de datos.'}
+    except Exception as e:
+        return {'status': 'error', 'message': str(e)}
+
+# --- Fin endpoint seguro ---
+
+@app.route('/admin/create_tables')
+def admin_create_tables():
+    # Endpoint seguro para crear tablas en la base de datos (solo uso temporal, eliminar después de usar)
+    token = request.args.get('token')
+    ADMIN_TOKEN = os.environ.get('ADMIN_CREATE_TABLES_TOKEN', 'supersecrettoken')
+    if token != ADMIN_TOKEN:
+        return "No autorizado", 403
+    try:
+        db.create_all()
+        return "Tablas creadas correctamente en la base de datos.", 200
+    except Exception as e:
+        return f"Error al crear tablas: {e}", 500
 
 if __name__ == '__main__':
     try:

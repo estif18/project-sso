@@ -1037,6 +1037,10 @@ def check_admin():
     token = request.args.get('token') or request.headers.get('X-Admin-Token')
     return token == ADMIN_TOKEN
 
+
+
+
+# --- Endpoint seguro para crear tablas en la base de datos (solo uso temporal/admin) ---
 @app.route('/admin/create_tables', methods=['POST'])
 def admin_create_tables():
     if not check_admin():
@@ -1048,19 +1052,6 @@ def admin_create_tables():
         return {'status': 'error', 'message': str(e)}
 
 # --- Fin endpoint seguro ---
-
-@app.route('/admin/create_tables')
-def admin_create_tables():
-    # Endpoint seguro para crear tablas en la base de datos (solo uso temporal, eliminar después de usar)
-    token = request.args.get('token')
-    ADMIN_TOKEN = os.environ.get('ADMIN_CREATE_TABLES_TOKEN', 'supersecrettoken')
-    if token != ADMIN_TOKEN:
-        return "No autorizado", 403
-    try:
-        db.create_all()
-        return "Tablas creadas correctamente en la base de datos.", 200
-    except Exception as e:
-        return f"Error al crear tablas: {e}", 500
 
 if __name__ == '__main__':
     try:
